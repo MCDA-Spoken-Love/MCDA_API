@@ -27,8 +27,5 @@ router = DefaultRouter()
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('authapp/', include('auth_app.urls')),  # Include the mcda_api URLs
-
-    path('token/', TokenObtainPairView.as_view(), name='token_obtain_pair'),
-    path('token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
+    path('api/', include('Account.urls')),
 ]

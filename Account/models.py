@@ -51,7 +51,7 @@ class Users(AbstractUser):
     has_accepted_privacy_policy = models.BooleanField(default=False)
 
     def __str__(self):
-        return self.userName
+        return self.username
 
 
 # class ChatTheme(Enum):
@@ -77,7 +77,7 @@ class Users(AbstractUser):
 #         max_length=100, choices=Sexuality.choices(), null=True)
 
 #     def __str__(self):
-#         return self.userName
+#         return self.username
 
 
 # class UserPrivacy(models.Model):
@@ -87,7 +87,7 @@ class Users(AbstractUser):
 #     allow_biometric = models.BooleanField(default=False)
 
 #     def __str__(self):
-#         return f"Privacy settings for {self.user.userName}"
+#         return f"Privacy settings for {self.user.username}"
 
 
 # class Chat(models.Model):
@@ -104,7 +104,7 @@ class Users(AbstractUser):
 #         max_length=10, choices=ChatTheme.choices(), null=True)
 
 #     def __str__(self):
-#         return f"Chat between {self.firstUser.userName} and {self.secondUser.userName}"
+#         return f"Chat between {self.firstUser.username} and {self.secondUser.username}"
 
 
 # class ChatMessages(models.Model):
@@ -115,4 +115,4 @@ class Users(AbstractUser):
 #     timestamp = models.DateTimeField(auto_now_add=True)
 
 #     def __str__(self):
-#         return f"Message from {self.sender.userName} in chat {self.chat.id}"
+#         return f"Message from {self.sender.username} in chat {self.chat.id}"
