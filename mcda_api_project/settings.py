@@ -124,7 +124,7 @@ AUTH_PASSWORD_VALIDATORS = [
 REST_FRAMEWORK = {
   'DEFAULT_PERMISSION_CLASSES': ('rest_framework.permissions.IsAuthenticated',),
   'DEFAULT_AUTHENTICATION_CLASSES': (
-        'dj_rest_auth.jwt_auth.JWTCookieAuthentication',
+        'rest_framework_simplejwt.authentication.JWTAuthentication',
     )
 }
 
@@ -168,10 +168,9 @@ SIMPLE_JWT = {
 # dj-rest-auth
 REST_AUTH = {
     "USE_JWT": True,
-    "JWT_AUTH_COOKIE": "_auth",  # Name of access token cookie
-    "JWT_AUTH_REFRESH_COOKIE": "_refresh", # Name of refresh token cookie
     "JWT_AUTH_HTTPONLY": False,  # Makes sure refresh token is sent
-    'REGISTER_SERIALIZER': 'Account.registerserializer.CustomRegisterSerializer',
+    'REGISTER_SERIALIZER': 'Account.serializer.CustomRegisterSerializer',
+    'USER_DETAILS_SERIALIZER': 'Account.serializer.CustomUserDetailsSerializer',
 }
 
 REST_AUTH_REGISTER_SERIALIZERS = {

@@ -98,3 +98,10 @@ class CustomRegisterSerializer(serializers.Serializer):
         self.custom_signup(request, user)
         user.save()
         return user
+
+
+class CustomUserDetailsSerializer(serializers.ModelSerializer):
+    # Add any additional fields you want to include
+    class Meta:
+        model = Users
+        fields = '__all__'
