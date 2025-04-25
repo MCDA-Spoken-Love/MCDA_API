@@ -2,9 +2,10 @@ from rest_framework import serializers
 from allauth.utils import (get_username_max_length)
 from allauth.account import app_settings as allauth_settings
 from allauth.account.adapter import get_adapter
+from django.db import transaction
 
 from allauth.account.models import EmailAddress
-from Account.models import Gender, Sexuality
+from Account.models import Gender, Sexuality, Users
 
 class CustomRegisterSerializer(serializers.Serializer):
     first_name = serializers.CharField(max_length=30)
@@ -23,11 +24,36 @@ class CustomRegisterSerializer(serializers.Serializer):
 
     def validate_email(self,email):
         email = get_adapter().clean_email(email)
-        if EmailAddress.objects.filter(email=email).exists():
+        print(f'--------------{email}------------------')
+        if not email:
             raise serializers.ValidationError(
-                self.error_messages['email'], code='email')
+                "Email is required.")
+        if Users.objects.filter(email=email).exists():
+            raise serializers.ValidationError(
+                "Email already exists.")
 
         return email
+
+    def validate_connection_code(self, connection_code):
+        if not connection_code:
+            raise serializers.ValidationError(
+                "Connection code is required.")
+        if len(connection_code) < 6:
+            raise serializers.ValidationError(
+                "Connection code must be at least 6 characters long.")
+        if Users.objects.filter(connection_code=connection_code).exists():
+            raise serializers.ValidationError(
+                "Connection code already exists.")
+        return connection_code
+
+    def validate_username(self, username):
+        if not username:
+            raise serializers.ValidationError(
+                "Username is required.")
+        if Users.objects.filter(username=username).exists():
+            raise serializers.ValidationError(
+                "Username already exists.")
+        return username
 
     def custom_signup(self,request,user):
         user.first_name = self.validated_data['first_name']
@@ -62,6 +88,8 @@ class CustomRegisterSerializer(serializers.Serializer):
             'username': self.validated_data['username'],
         }
 
+
+    @transaction.atomic
     def save(self,request):
         adapter = get_adapter()
         user = adapter.new_user(request)
