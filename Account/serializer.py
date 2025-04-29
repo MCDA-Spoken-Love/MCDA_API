@@ -1,28 +1,30 @@
-from rest_framework import serializers
-from allauth.utils import (get_username_max_length)
-from allauth.account import app_settings as allauth_settings
 from allauth.account.adapter import get_adapter
+from allauth.utils import get_username_max_length
 from django.db import transaction
+from rest_framework import serializers
 
-from allauth.account.models import EmailAddress
 from Account.models import Gender, Sexuality, Users
+
 
 class CustomRegisterSerializer(serializers.Serializer):
     first_name = serializers.CharField(max_length=30)
     last_name = serializers.CharField(max_length=30)
     email = serializers.EmailField(max_length=255, required=True)
-    password = serializers.CharField(max_length=128, write_only=True)
     gender = serializers.ChoiceField(choices=Gender.choices(), required=False)
-    sexuality = serializers.ChoiceField(choices=Sexuality.choices(), required=False)
+    sexuality = serializers.ChoiceField(
+        choices=Sexuality.choices(), required=False)
     connection_code = serializers.CharField(max_length=255, required=True)
     partner_id = serializers.IntegerField(required=False)
-    relation_ship_start_date = serializers.DateField(required=False)
+    relationship_start_date = serializers.DateField(required=False)
     has_accepted_terms_and_conditions = serializers.BooleanField(default=False)
     has_accepted_privacy_policy = serializers.BooleanField(default=False)
     username = serializers.CharField(
         max_length=get_username_max_length(), required=True)
 
-    def validate_email(self,email):
+    password1 = serializers.CharField(write_only=True, required=True)
+    password2 = serializers.CharField(write_only=True, required=True)
+
+    def validate_email(self, email):
         email = get_adapter().clean_email(email)
         print(f'--------------{email}------------------')
         if not email:
@@ -55,18 +57,29 @@ class CustomRegisterSerializer(serializers.Serializer):
                 "Username already exists.")
         return username
 
-    def custom_signup(self,request,user):
+    def validate_password1(self, password):
+        return get_adapter().clean_password(password)
+
+    def validate(self, data):
+        if data['password1'] != data['password2']:
+            raise serializers.ValidationError(
+                ("The two password fields didn't match."))
+        return data
+
+    def custom_signup(self, request, user):
         user.first_name = self.validated_data['first_name']
         user.last_name = self.validated_data['last_name']
         user.email = self.validated_data['email']
         user.username = self.validated_data['username']
-        user.password = self.validated_data['password']
+        user.password1 = self.validated_data['password1']
+        user.password2 = self.validated_data['password2']
         user.gender = self.validated_data['gender']
         user.sexuality = self.validated_data['sexuality']
         user.connection_code = self.validated_data['connection_code']
         user.partner_id = self.validated_data['partner_id']
-        user.relation_ship_start_date = self.validated_data['relation_ship_start_date']
-        user.has_accepted_terms_and_conditions = self.validated_data['has_accepted_terms_and_conditions']
+        user.relationship_start_date = self.validated_data['relationship_start_date']
+        user.has_accepted_terms_and_conditions = self.validated_data[
+            'has_accepted_terms_and_conditions']
         user.has_accepted_privacy_policy = self.validated_data['has_accepted_privacy_policy']
         user.username = self.validated_data['username']
         user.save()
@@ -75,22 +88,22 @@ class CustomRegisterSerializer(serializers.Serializer):
     def get_cleaned_data(self):
         return {
             'email': self.validated_data['email'],
-            'password': self.validated_data['password'],
+            'password1': self.validated_data['password2'],
+            'password2': self.validated_data['password2'],
             'first_name': self.validated_data['first_name'],
             'last_name': self.validated_data['last_name'],
             'gender': self.validated_data['gender'],
             'sexuality': self.validated_data['sexuality'],
             'connection_code': self.validated_data['connection_code'],
             'partner_id': self.validated_data['partner_id'],
-            'relation_ship_start_date': self.validated_data['relation_ship_start_date'],
+            'relationship_start_date': self.validated_data['relationship_start_date'],
             'has_accepted_terms_and_conditions': self.validated_data['has_accepted_terms_and_conditions'],
             'has_accepted_privacy_policy': self.validated_data['has_accepted_privacy_policy'],
             'username': self.validated_data['username'],
         }
 
-
     @transaction.atomic
-    def save(self,request):
+    def save(self, request):
         adapter = get_adapter()
         user = adapter.new_user(request)
         self.cleaned_data = self.get_cleaned_data()
