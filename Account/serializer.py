@@ -14,8 +14,7 @@ class CustomRegisterSerializer(serializers.Serializer):
     sexuality = serializers.ChoiceField(
         choices=Sexuality.choices(), required=False)
     connection_code = serializers.CharField(max_length=255, required=True)
-    partner_id = serializers.IntegerField(required=False)
-    relationship_start_date = serializers.DateField(required=False)
+    relation_ship_start_date = serializers.DateField(required=False)
     has_accepted_terms_and_conditions = serializers.BooleanField(default=False)
     has_accepted_privacy_policy = serializers.BooleanField(default=False)
     username = serializers.CharField(
@@ -76,8 +75,7 @@ class CustomRegisterSerializer(serializers.Serializer):
         user.gender = self.validated_data['gender']
         user.sexuality = self.validated_data['sexuality']
         user.connection_code = self.validated_data['connection_code']
-        user.partner_id = self.validated_data['partner_id']
-        user.relationship_start_date = self.validated_data['relationship_start_date']
+        user.relation_ship_start_date = self.validated_data['relation_ship_start_date']
         user.has_accepted_terms_and_conditions = self.validated_data[
             'has_accepted_terms_and_conditions']
         user.has_accepted_privacy_policy = self.validated_data['has_accepted_privacy_policy']
@@ -95,8 +93,7 @@ class CustomRegisterSerializer(serializers.Serializer):
             'gender': self.validated_data['gender'],
             'sexuality': self.validated_data['sexuality'],
             'connection_code': self.validated_data['connection_code'],
-            'partner_id': self.validated_data['partner_id'],
-            'relationship_start_date': self.validated_data['relationship_start_date'],
+            'relation_ship_start_date': self.validated_data['relation_ship_start_date'],
             'has_accepted_terms_and_conditions': self.validated_data['has_accepted_terms_and_conditions'],
             'has_accepted_privacy_policy': self.validated_data['has_accepted_privacy_policy'],
             'username': self.validated_data['username'],

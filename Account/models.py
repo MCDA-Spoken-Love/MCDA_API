@@ -45,10 +45,11 @@ class Users(AbstractUser):
     sexuality = models.CharField(
         max_length=100, choices=Sexuality.choices(), null=True)
     connection_code = models.CharField(max_length=255, unique=True)
-    partner_id = models.IntegerField(null=True)
     relation_ship_start_date = models.DateField(null=True)
     has_accepted_terms_and_conditions = models.BooleanField(default=False)
     has_accepted_privacy_policy = models.BooleanField(default=False)
+    partner = models.ForeignKey(
+        'self', null=True, related_name='users', on_delete=models.DO_NOTHING)
 
     def __str__(self):
         return self.username
