@@ -10,31 +10,19 @@ from Account.models import Users
 
 @api_view(['GET'])
 @permission_classes([])
-def get_user_by_username(request, username):
+def get_user_by_filter(request):
     try:
-        user = Users.objects.get(username=username)
-        user_data = {
-            "username": user.username,
-            "email": user.email,
-            "first_name": user.first_name,
-            "last_name": user.last_name,
-        }
-        return Response(user_data, status=status.HTTP_200_OK)
-    except Users.DoesNotExist:
-        return Response({"message": "User not found"}, status=status.HTTP_404_NOT_FOUND)
+        username = request.query_params.get('username')
+        email = request.query_params.get('email')
+        all_users = []
+        if not username and not email:
+            return Response({"message": "Please provide an username or email"}, status=status.HTTP_400_BAD_REQUEST)
+        else:
+            if username:
+                all_users = Users.objects.filter(username=username)
+            if email:
+                all_users = Users.objects.filter(email=email)
 
-
-@api_view(['GET'])
-@permission_classes([])
-def get_user_by_email(request, email):
-    try:
-        user = Users.objects.get(email=email)
-        user_data = {
-            "username": user.username,
-            "email": user.email,
-            "first_name": user.first_name,
-            "last_name": user.last_name,
-        }
-        return Response(user_data, status=status.HTTP_200_OK)
-    except Users.DoesNotExist:
-        return Response({"message": "User not found"}, status=status.HTTP_404_NOT_FOUND)
+        return Response({"user_count": len(all_users)}, status=status.HTTP_200_OK)
+    except Exception as e:
+        return Response({"message": "Error in getting user by filter", "stack_trace": e}, status=status.HTTP_400_BAD_REQUEST)
