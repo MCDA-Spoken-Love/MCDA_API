@@ -4,6 +4,7 @@ from django.db import transaction
 from rest_framework import serializers
 
 from Account.models import Gender, Sexuality, Users
+from Account.utils import email_to_code
 
 
 class CustomRegisterSerializer(serializers.Serializer):
@@ -13,8 +14,6 @@ class CustomRegisterSerializer(serializers.Serializer):
     gender = serializers.ChoiceField(choices=Gender.choices(), required=False)
     sexuality = serializers.ChoiceField(
         choices=Sexuality.choices(), required=False)
-    connection_code = serializers.CharField(max_length=255, required=True)
-    relation_ship_start_date = serializers.DateField(required=False)
     has_accepted_terms_and_conditions = serializers.BooleanField(default=False)
     has_accepted_privacy_policy = serializers.BooleanField(default=False)
     username = serializers.CharField(
@@ -25,7 +24,6 @@ class CustomRegisterSerializer(serializers.Serializer):
 
     def validate_email(self, email):
         email = get_adapter().clean_email(email)
-        print(f'--------------{email}------------------')
         if not email:
             raise serializers.ValidationError(
                 "Email is required.")
@@ -34,18 +32,6 @@ class CustomRegisterSerializer(serializers.Serializer):
                 "Email already exists.")
 
         return email
-
-    def validate_connection_code(self, connection_code):
-        if not connection_code:
-            raise serializers.ValidationError(
-                "Connection code is required.")
-        if len(connection_code) < 6:
-            raise serializers.ValidationError(
-                "Connection code must be at least 6 characters long.")
-        if Users.objects.filter(connection_code=connection_code).exists():
-            raise serializers.ValidationError(
-                "Connection code already exists.")
-        return connection_code
 
     def validate_username(self, username):
         if not username:
@@ -74,8 +60,7 @@ class CustomRegisterSerializer(serializers.Serializer):
         user.password2 = self.validated_data['password2']
         user.gender = self.validated_data['gender']
         user.sexuality = self.validated_data['sexuality']
-        user.connection_code = self.validated_data['connection_code']
-        user.relation_ship_start_date = self.validated_data['relation_ship_start_date']
+        user.connection_code = email_to_code(self.validated_data['email'])
         user.has_accepted_terms_and_conditions = self.validated_data[
             'has_accepted_terms_and_conditions']
         user.has_accepted_privacy_policy = self.validated_data['has_accepted_privacy_policy']
@@ -84,6 +69,7 @@ class CustomRegisterSerializer(serializers.Serializer):
         return user
 
     def get_cleaned_data(self):
+        print(self)
         return {
             'email': self.validated_data['email'],
             'password1': self.validated_data['password2'],
@@ -92,8 +78,6 @@ class CustomRegisterSerializer(serializers.Serializer):
             'last_name': self.validated_data['last_name'],
             'gender': self.validated_data['gender'],
             'sexuality': self.validated_data['sexuality'],
-            'connection_code': self.validated_data['connection_code'],
-            'relation_ship_start_date': self.validated_data['relation_ship_start_date'],
             'has_accepted_terms_and_conditions': self.validated_data['has_accepted_terms_and_conditions'],
             'has_accepted_privacy_policy': self.validated_data['has_accepted_privacy_policy'],
             'username': self.validated_data['username'],
