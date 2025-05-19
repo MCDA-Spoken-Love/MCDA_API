@@ -69,7 +69,6 @@ class CustomRegisterSerializer(serializers.Serializer):
         return user
 
     def get_cleaned_data(self):
-        print(self)
         return {
             'email': self.validated_data['email'],
             'password1': self.validated_data['password2'],
