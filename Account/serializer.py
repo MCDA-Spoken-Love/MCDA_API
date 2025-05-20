@@ -100,5 +100,6 @@ class CustomRegisterSerializer(serializers.Serializer):
 class CustomUserDetailsSerializer(serializers.ModelSerializer):
     class Meta:
         model = Users
-        # add fields as needed
-        fields = "__all__"
+        exclude = ('password',)  # Exclude password for security
+        read_only_fields = ('id', 'date_joined', 'last_login',
+                            'is_superuser', 'is_staff')
