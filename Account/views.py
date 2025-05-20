@@ -35,7 +35,7 @@ def manager_user_relationshop(request):
     current_user = request.user
     today = date.today()
     try:
-        if request.method == 'POST':
+        if request.method == 'POST' or request.method == 'PUT':
             connection_code = request.data.get('connection_code')
             if not connection_code:
                 return Response({"message": "Please provide a connection code"}, status=status.HTTP_400_BAD_REQUEST)
@@ -48,14 +48,6 @@ def manager_user_relationshop(request):
 
             return Response({"message": f"{current_user.first_name} and {partner.first_name} are now dating! Congratulations!"}, status=status.HTTP_200_OK)
 
-        if request.method == 'PUT':
-            partner = Users.objects.get(id=request.data.get('partner_id'))
-            Users.objects.filter(id=current_user.id).update(
-                partner=partner.id, relation_ship_start_date=today)
-            Users.objects.filter(id=partner.id).update(
-                partner=current_user.id, relation_ship_start_date=today)
-
-            return Response({"message": f"{current_user.first_name} and {partner.first_name} are now dating! Congratulations!"}, status=status.HTTP_200_OK)
         if request.method == 'DELETE':
             partner = Users.objects.get(id=current_user.partner.id)
             if not partner:

@@ -93,8 +93,18 @@ class CustomRegisterSerializer(serializers.Serializer):
         return user
 
 
-class CustomUserDetailsSerializer(serializers.ModelSerializer):
-    # Add any additional fields you want to include
+class PartnerSerializer(serializers.ModelSerializer):
     class Meta:
         model = Users
-        fields = '__all__'
+        fields = ('id',  'username', 'email',
+                  'first_name', 'last_name', 'gender', 'sexuality', 'connection_code',
+                  'relation_ship_start_date')
+
+
+class CustomUserDetailsSerializer(serializers.ModelSerializer):
+    partner = PartnerSerializer(read_only=True)
+
+    class Meta:
+        model = Users
+        # add fields as needed
+        fields = "__all__"
