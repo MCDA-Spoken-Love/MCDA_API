@@ -32,7 +32,7 @@ SECRET_KEY = 'django-insecure-3s(m&w=sg68_0cira5t2)en$wla#ybn^rie^@d-#yv7)dc4bkj
 DEBUG = True
 
 ALLOWED_HOSTS = ['10.0.3.2', 'localhost', '127.0.0.1',
-                 '259d-2804-1b3-6180-3f59-cf55-9db0-427c-2063.ngrok-free.app']
+                 '.ngrok-free.app', '192.168.15.6']
 
 
 # Application definition
@@ -45,6 +45,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'django.contrib.sites',
+    'corsheaders',
     'rest_framework',
     'rest_framework.authtoken',
     'allauth',
@@ -60,6 +61,7 @@ SITE_ID = 1
 MIDDLEWARE = [
     'allauth.account.middleware.AccountMiddleware',
     'django.middleware.security.SecurityMiddleware',
+    'corsheaders.middleware.CorsMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
@@ -183,3 +185,7 @@ REST_AUTH_REGISTER_SERIALIZERS = {
 ACCOUNT_EMAIL_VERIFICATION = None
 ACCOUNT_AUTHENTICATION_METHOD = 'email'
 ACCOUNT_EMAIL_REQUIRED = True
+
+# CORS settings
+CORS_ALLOW_ALL_ORIGINS = True  # Only for development!
+CORS_ALLOW_CREDENTIALS = True
