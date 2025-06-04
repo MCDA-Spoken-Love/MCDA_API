@@ -5,6 +5,7 @@ from rest_framework import serializers
 
 from Account.models import Gender, Sexuality, Users
 from Account.utils import email_to_code
+from Privacy.models import UserPrivacy
 
 
 class CustomRegisterSerializer(serializers.Serializer):
@@ -90,6 +91,9 @@ class CustomRegisterSerializer(serializers.Serializer):
         adapter.save_user(request, user, self)
         self.custom_signup(request, user)
         user.save()
+
+        privacy = UserPrivacy(user=user)
+        privacy.save()
         return user
 
 
@@ -98,7 +102,7 @@ class PartnerSerializer(serializers.ModelSerializer):
         model = Users
         fields = ('id',  'username', 'email',
                   'first_name', 'last_name', 'gender', 'sexuality', 'connection_code',
-                  'relation_ship_start_date')
+                  'relation_ship_start_date', 'partner')
 
 
 class CustomUserDetailsSerializer(serializers.ModelSerializer):
