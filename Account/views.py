@@ -31,7 +31,7 @@ def get_user_by_filter(request):
 
 
 @api_view(['GET', 'POST', 'PUT', 'DELETE'])
-def manager_user_relationshop(request):
+def manager_user_relationship(request):
     current_user = request.user
     today = date.today()
     try:
@@ -59,5 +59,16 @@ def manager_user_relationshop(request):
                 partner=None, relation_ship_start_date=None)
 
             return Response({"message": f"{current_user.first_name} and {partner.first_name} are no longer dating!"}, status=status.HTTP_200_OK)
+    except Exception as e:
+        return Response({"message": "Error in managing user relationship", "stack_trace": e}, status=status.HTTP_400_BAD_REQUEST)
+
+
+@api_view(['DELETE'])
+def manage_user(request):
+    user = request.user
+    try:
+        if request.method == 'DELETE':
+            Users.objects.get(id=user.id).delete()
+            return Response({"message": f"{user.username} successfully deleted"}, status=status.HTTP_200_OK)
     except Exception as e:
         return Response({"message": "Error in managing user relationship", "stack_trace": e}, status=status.HTTP_400_BAD_REQUEST)
