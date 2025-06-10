@@ -81,7 +81,7 @@ def manage_user(request):
 
             Users.objects.get(id=user.id).delete()
 
-            return Response({"message": f"@{user.username}'s successfully deleted"}, status=status.HTTP_200_OK)
+            return Response({"message": f"@{user.username}'s account was successfully deleted"}, status=status.HTTP_200_OK)
         except Exception as e:
             print(e)
             return Response({"message": "Error in deleting user", "full_error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
