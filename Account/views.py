@@ -74,10 +74,14 @@ def manage_user(request):
         try:
             Users.objects.filter(id=user.id).update(
                 partner=None, relation_ship_start_date=None)
-            Users.objects.filter(id=user.partner.id).update(
-                partner=None, relation_ship_start_date=None)
+
+            if user.partner is not None:
+                Users.objects.filter(id=user.partner.id).update(
+                    partner=None, relation_ship_start_date=None)
+
             Users.objects.get(id=user.id).delete()
-            return Response({"message": f"{user.username} successfully deleted"}, status=status.HTTP_200_OK)
+
+            return Response({"message": f"@{user.username}'s successfully deleted"}, status=status.HTTP_200_OK)
         except Exception as e:
             print(e)
             return Response({"message": "Error in deleting user", "full_error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
