@@ -17,7 +17,7 @@ def get_privacy_settings(request):
         serializer = UserPrivacySerializer(privacy_settings)
         return Response(serializer.data, status=status.HTTP_200_OK)
     except Exception as e:
-        return Response({"message": "Error in getting user status visibility", "stack_trace": e}, status=status.HTTP_400_BAD_REQUEST)
+        return Response({"message": "Error in getting user status visibility", "full_error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
 
 @api_view(['PUT'])
@@ -30,7 +30,7 @@ def toggle_status_visibility(request):
         serializer = UserPrivacySerializer(privacy_settings)
         return Response(serializer.data, status=status.HTTP_200_OK)
     except Exception as e:
-        return Response({"message": "Error in managing user status visibility", "stack_trace": e}, status=status.HTTP_400_BAD_REQUEST)
+        return Response({"message": "Error in managing user status visibility", "full_error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
 
 @api_view(['PUT'])
@@ -43,4 +43,4 @@ def toggle_last_seen(request):
         serializer = UserPrivacySerializer(privacy_settings)
         return Response(serializer.data, status=status.HTTP_200_OK)
     except Exception as e:
-        return Response({"message": "Error in managing user last seen visibility", "stack_trace": e}, status=status.HTTP_400_BAD_REQUEST)
+        return Response({"message": "Error in managing user last seen visibility", "full_error": str(e)}, status=status.HTTP_400_BAD_REQUEST)

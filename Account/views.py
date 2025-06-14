@@ -20,14 +20,17 @@ def get_user_by_filter(request):
         if not username and not email:
             return Response({"message": "Please provide an username or email"}, status=status.HTTP_400_BAD_REQUEST)
         else:
-            if username:
+            if username and email:
+                all_users = Users.objects.filter(
+                    username=username, email=email)
+            elif username:
                 all_users = Users.objects.filter(username=username)
-            if email:
+            elif email:
                 all_users = Users.objects.filter(email=email)
 
         return Response({"user_count": len(all_users)}, status=status.HTTP_200_OK)
     except Exception as e:
-        return Response({"message": "Error in getting user by filter", "stack_trace": e}, status=status.HTTP_400_BAD_REQUEST)
+        return Response({"message": "Error in getting user by filter", "full_error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
 
 @api_view(['GET', 'POST', 'PUT', 'DELETE'])
@@ -60,15 +63,25 @@ def manager_user_relationship(request):
 
             return Response({"message": f"{current_user.first_name} and {partner.first_name} are no longer dating!"}, status=status.HTTP_200_OK)
     except Exception as e:
-        return Response({"message": "Error in managing user relationship", "stack_trace": e}, status=status.HTTP_400_BAD_REQUEST)
+        return Response({"message": "Error in managing user relationship", "full_error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
 
 @api_view(['DELETE'])
 def manage_user(request):
     user = request.user
-    try:
-        if request.method == 'DELETE':
+
+    if request.method == 'DELETE':
+        try:
+            Users.objects.filter(id=user.id).update(
+                partner=None, relation_ship_start_date=None)
+
+            if user.partner is not None:
+                Users.objects.filter(id=user.partner.id).update(
+                    partner=None, relation_ship_start_date=None)
+
             Users.objects.get(id=user.id).delete()
-            return Response({"message": f"{user.username} successfully deleted"}, status=status.HTTP_200_OK)
-    except Exception as e:
-        return Response({"message": "Error in managing user relationship", "stack_trace": e}, status=status.HTTP_400_BAD_REQUEST)
+
+            return Response({"message": f"@{user.username}'s account was successfully deleted"}, status=status.HTTP_200_OK)
+        except Exception as e:
+            print(e)
+            return Response({"message": "Error in deleting user", "full_error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
