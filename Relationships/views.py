@@ -74,5 +74,6 @@ def respond_relationship_request(request, pk):
                 return Response({"message": f"{current_user.first_name} has rejected {partner.first_name}'s love confession :("}, status=status.HTTP_200_OK)
 
     except Exception as e:
-        print(e)
+        if 'Duplicate entry' in str(e):
+            return Response({"message": "Error in creating relationship another relationship", "full_error": 'Request already accepted'}, status=status.HTTP_400_BAD_REQUEST)
         return Response({"message": "Error in responding to relationship request", "full_error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
