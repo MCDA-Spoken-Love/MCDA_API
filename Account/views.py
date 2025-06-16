@@ -72,13 +72,6 @@ def manage_user(request):
 
     if request.method == 'DELETE':
         try:
-            Users.objects.filter(id=user.id).update(
-                partner=None, relation_ship_start_date=None)
-
-            if user.partner is not None:
-                Users.objects.filter(id=user.partner.id).update(
-                    partner=None, relation_ship_start_date=None)
-
             Users.objects.get(id=user.id).delete()
 
             return Response({"message": f"@{user.username}'s account was successfully deleted"}, status=status.HTTP_200_OK)
