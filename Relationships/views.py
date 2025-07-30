@@ -85,7 +85,6 @@ def respond_relationship_request(request, pk):
             return Response({"message": "Please provide an appropriate response"}, status=status.HTTP_400_BAD_REQUEST)
 
         else:
-            print('aqui', accept)
             relationship_request = RelationshipRequest.objects.get(
                 pk=pk)
             partner = Users.objects.get(
@@ -97,7 +96,7 @@ def respond_relationship_request(request, pk):
                                             user_two=relationship_request.receiver, relationship_start_date=relationship_start_date)
 
                 RelationshipRequest.objects.filter(
-                    pk=pk).update(status='ACCEPTED')
+                    pk=pk).delete()
                 return Response({"message": f"{current_user.first_name} and {partner.first_name} are now dating! Congratulations!"}, status=status.HTTP_200_OK)
 
             elif accept is False:
