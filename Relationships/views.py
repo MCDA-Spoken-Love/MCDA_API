@@ -1,6 +1,7 @@
 
 from datetime import date
 
+from django.db.models import Q
 from rest_framework import status
 from rest_framework.decorators import (
     api_view,
@@ -9,6 +10,39 @@ from rest_framework.response import Response
 
 from Account.models import Users
 from Relationships.models import Relationship, RelationshipRequest
+from Relationships.serializer import RelationshipSerializer
+
+
+@api_view(['GET', 'POST', 'PUT', 'DELETE'])
+def manage_relationships(request):
+    current_user = request.user
+    if request.method == 'GET':
+        try:
+            relationship = Relationship.objects.filter(
+                Q(user_one_id=current_user) | Q(user_two_id=current_user)
+            )
+            serializer = RelationshipSerializer(
+                relationship, many=True).data
+            return Response(serializer, status=status.HTTP_200_OK)
+        except Exception as e:
+            return Response({"message": "Error requesting user relationship", "full_error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
+
+    if request.method == 'DELETE':
+        try:
+            relationship = Relationship.objects.filter(
+                Q(user_one_id=current_user) | Q(user_two_id=current_user)
+            )
+            serializer = RelationshipSerializer(
+                relationship, many=True).data
+            if len(serializer):
+                relationship.delete()
+                return Response({"message": "You have ended things with your partner"}, status=status.HTTP_200_OK)
+
+            else:
+                return Response({"message": "You don't have a relationship to terminate"}, status=status.HTTP_409_CONFLICT)
+
+        except Exception as e:
+            return Response({"message": "Error terminating relationship", "full_error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
 
 @api_view(['POST'])
@@ -54,11 +88,9 @@ def respond_relationship_request(request, pk):
             print('aqui', accept)
             relationship_request = RelationshipRequest.objects.get(
                 pk=pk)
-            print(relationship_request)
             partner = Users.objects.get(
                 pk=relationship_request.requester.id)
             if accept is True:
-                print('aqui de novo')
                 relationship_start_date = request.data.get(
                     'relationship_start_date') if request.data.get('relationship_start_date') else today
                 Relationship.objects.create(user_one=relationship_request.requester,
