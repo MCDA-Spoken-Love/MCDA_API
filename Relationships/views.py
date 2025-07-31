@@ -89,7 +89,7 @@ def respond_relationship_request(request, pk):
                 pk=pk)
             partner = Users.objects.get(
                 pk=relationship_request.requester.id)
-            if accept is True:
+            if accept == True or str(accept).lower() == 'true':
                 relationship_start_date = request.data.get(
                     'relationship_start_date') if request.data.get('relationship_start_date') else today
                 Relationship.objects.create(user_one=relationship_request.requester,
@@ -99,10 +99,13 @@ def respond_relationship_request(request, pk):
                     pk=pk).delete()
                 return Response({"message": f"{current_user.first_name} and {partner.first_name} are now dating! Congratulations!"}, status=status.HTTP_200_OK)
 
-            elif accept is False:
+            elif accept == False or str(accept).lower() == 'false':
                 RelationshipRequest.objects.filter(
                     pk=pk).update(status='REJECTED')
                 return Response({"message": f"{current_user.first_name} has rejected {partner.first_name}'s love confession :("}, status=status.HTTP_200_OK)
+
+            else:
+                return Response({"message": "Invalid value for accept parameter"}, status=status.HTTP_400_BAD_REQUEST)
 
     except Exception as e:
         if 'Duplicate entry' in str(e):
