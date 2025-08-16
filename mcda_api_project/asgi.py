@@ -1,14 +1,19 @@
-
+# fmt: off
+# isort: skip_file
 import os
 
-from channels.auth import AuthMiddlewareStack
-from channels.routing import ProtocolTypeRouter, URLRouter
-from channels.security.websocket import AllowedHostsOriginValidator
-from django.core.asgi import get_asgi_application
-
-from Relationships.routing import websocket_urlpatterns
+import django
 
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'mcda_api_project.settings')
+django.setup()
+
+from channels.auth import AuthMiddlewareStack # noqa: E402
+from channels.routing import ProtocolTypeRouter, URLRouter # noqa: E402
+from channels.security.websocket import AllowedHostsOriginValidator  # noqa: E402
+from django.core.asgi import get_asgi_application # noqa: E402
+
+from Relationships.routing import websocket_urlpatterns # noqa: E402
+
 
 application = get_asgi_application()
 
