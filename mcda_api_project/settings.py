@@ -32,12 +32,19 @@ SECRET_KEY = 'django-insecure-3s(m&w=sg68_0cira5t2)en$wla#ybn^rie^@d-#yv7)dc4bkj
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['10.0.3.2', 'localhost', '10.0.2.2', '.ngrok-free.app']
+ALLOWED_HOSTS = [
+    '10.0.3.2',
+    'localhost',
+    '10.0.2.2',
+    '.ngrok-free.app',
+    "127.0.0.1",
+    "[::1]",]
 
 
 # Application definition
 
 INSTALLED_APPS = [
+    "daphne",
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -90,6 +97,15 @@ TEMPLATES = [
 ]
 
 WSGI_APPLICATION = 'mcda_api_project.wsgi.application'
+ASGI_APPLICATION = "mcda_api_project.asgi.application"
+CHANNEL_LAYERS = {
+    "default": {
+        "BACKEND": "channels_redis.core.RedisChannelLayer",
+        "CONFIG": {
+            "hosts": [("127.0.0.1", 6379)],
+        },
+    },
+}
 
 
 # Database

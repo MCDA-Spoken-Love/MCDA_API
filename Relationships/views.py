@@ -1,6 +1,8 @@
 
 from datetime import date
 
+from asgiref.sync import async_to_sync
+from channels.layers import get_channel_layer
 from django.db.models import Q
 from rest_framework import status
 from rest_framework.decorators import (
@@ -61,6 +63,19 @@ def create_relationship_request(request):
             requester=Users.objects.get(pk=current_user.id), receiver=Users.objects.get(pk=partner.id), status='PENDING')
         request.save()
 
+        channel_layer = get_channel_layer()
+        async_to_sync(channel_layer.group_send)(
+            f'user_{partner.id}',
+            {
+                'type': 'relationship_request_notification',
+                'content': {
+                    'message': f'{current_user.first_name} has asked you to be in a loving relationship with you',
+                    'requester_id': str(current_user.id),
+                    'requester_name': current_user.first_name
+                }
+            }
+        )
+
         return Response({"message": f"{current_user.first_name} has asked {partner.first_name} to be in a loving relationship with them!"}, status=status.HTTP_200_OK)
 
     except Exception as e:
@@ -89,17 +104,17 @@ def respond_relationship_request(request, pk):
                 pk=pk)
             partner = Users.objects.get(
                 pk=relationship_request.requester.id)
-            if accept == True or str(accept).lower() == 'true':
+            if accept or str(accept).lower() == 'true':
                 relationship_start_date = request.data.get(
                     'relationship_start_date') if request.data.get('relationship_start_date') else today
                 Relationship.objects.create(user_one=relationship_request.requester,
                                             user_two=relationship_request.receiver, relationship_start_date=relationship_start_date)
 
                 RelationshipRequest.objects.filter(
-                    pk=pk).delete()
+                    pk=pk).update(status='ACCEPTED')
                 return Response({"message": f"{current_user.first_name} and {partner.first_name} are now dating! Congratulations!"}, status=status.HTTP_200_OK)
 
-            elif accept == False or str(accept).lower() == 'false':
+            elif not accept or str(accept).lower() == 'false':
                 RelationshipRequest.objects.filter(
                     pk=pk).update(status='REJECTED')
                 return Response({"message": f"{current_user.first_name} has rejected {partner.first_name}'s love confession :("}, status=status.HTTP_200_OK)
@@ -109,5 +124,5 @@ def respond_relationship_request(request, pk):
 
     except Exception as e:
         if 'Duplicate entry' in str(e):
-            return Response({"message": "Error in creating relationship another relationship", "full_error": 'Request already accepted'}, status=status.HTTP_400_BAD_REQUEST)
+            return Response({"message": "Error in creating another relationship", "full_error": 'Request already accepted'}, status=status.HTTP_400_BAD_REQUEST)
         return Response({"message": "Error in responding to relationship request", "full_error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
