@@ -98,6 +98,7 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'mcda_api_project.wsgi.application'
 ASGI_APPLICATION = "mcda_api_project.asgi.application"
+
 CHANNEL_LAYERS = {
     "default": {
         "BACKEND": "channels_redis.core.RedisChannelLayer",

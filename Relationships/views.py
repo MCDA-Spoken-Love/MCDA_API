@@ -14,6 +14,8 @@ from Account.models import Users
 from Relationships.models import Relationship, RelationshipRequest
 from Relationships.serializer import RelationshipSerializer
 
+channel_layer = get_channel_layer()
+
 
 @api_view(['GET', 'POST', 'PUT', 'DELETE'])
 def manage_relationships(request):
@@ -63,9 +65,8 @@ def create_relationship_request(request):
             requester=Users.objects.get(pk=current_user.id), receiver=Users.objects.get(pk=partner.id), status='PENDING')
         request.save()
 
-        channel_layer = get_channel_layer()
         async_to_sync(channel_layer.group_send)(
-            f'user_{partner.id}',
+            f"user_{partner.id}",
             {
                 'type': 'relationship_request_notification',
                 'content': {
@@ -96,12 +97,12 @@ def respond_relationship_request(request, pk):
 
         accept = request.data.get('accept')
 
-        if accept is None:
-            return Response({"message": "Please provide an appropriate response"}, status=status.HTTP_400_BAD_REQUEST)
+        relationship_request = RelationshipRequest.objects.get(
+            pk=pk)
 
+        if (relationship_request.status != 'PENDING'):
+            return Response({"message": f"Relationship has already been {relationship_request.status.lower()}"}, status=status.HTTP_400_BAD_REQUEST)
         else:
-            relationship_request = RelationshipRequest.objects.get(
-                pk=pk)
             partner = Users.objects.get(
                 pk=relationship_request.requester.id)
             if accept or str(accept).lower() == 'true':
@@ -112,15 +113,38 @@ def respond_relationship_request(request, pk):
 
                 RelationshipRequest.objects.filter(
                     pk=pk).update(status='ACCEPTED')
+
+                async_to_sync(channel_layer.group_send)(
+                    f"user_{partner.id}",
+                    {
+                        'type': 'relationship_request_notification',
+                        'content': {
+                            'message': f'{current_user.first_name} said yes! Congrats!',
+                            'requester_id': str(current_user.id),
+                                'requester_name': current_user.first_name
+                        }
+                    }
+                )
+
                 return Response({"message": f"{current_user.first_name} and {partner.first_name} are now dating! Congratulations!"}, status=status.HTTP_200_OK)
 
             elif not accept or str(accept).lower() == 'false':
                 RelationshipRequest.objects.filter(
                     pk=pk).update(status='REJECTED')
-                return Response({"message": f"{current_user.first_name} has rejected {partner.first_name}'s love confession :("}, status=status.HTTP_200_OK)
 
-            else:
-                return Response({"message": "Invalid value for accept parameter"}, status=status.HTTP_400_BAD_REQUEST)
+                async_to_sync(channel_layer.group_send)(
+                    f"user_{partner.id}",
+                    {
+                        'type': 'relationship_request_notification',
+                        'content': {
+                            'message': f'{current_user.first_name} has said no, I\'m sorry...',
+                            'requester_id': str(current_user.id),
+                                'requester_name': current_user.first_name
+                        }
+                    }
+                )
+
+                return Response({"message": f"{current_user.first_name} has rejected {partner.first_name}'s love confession :("}, status=status.HTTP_200_OK)
 
     except Exception as e:
         if 'Duplicate entry' in str(e):

@@ -4,15 +4,14 @@ import json
 import logging
 
 from channels.generic.websocket import AsyncWebsocketConsumer
-from django.contrib.auth.models import AnonymousUser
 
 logger = logging.getLogger("django")
 
 
 class RelationshipConsumer(AsyncWebsocketConsumer):
     async def connect(self):
-        self.user = self.scope.get('user', AnonymousUser())
-        self.group_name = f"user_{getattr(self.user, 'id', 'anon')}"
+        self.user = self.scope["user"]
+        self.group_name = f"user_{getattr(self.user, 'id')}"
         await self.channel_layer.group_add(self.group_name, self.channel_name)
         await self.accept()
         await self.send(text_data=json.dumps({"message": "Connected!"}))
