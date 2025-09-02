@@ -5,8 +5,8 @@ from rest_framework.decorators import (
 )
 from rest_framework.response import Response
 
-from Privacy.models import UserPrivacy
-from Privacy.serializer import UserPrivacySerializer
+from apps.Privacy.models import UserPrivacy
+from apps.Privacy.serializer import UserPrivacySerializer
 
 
 @api_view(['GET'])

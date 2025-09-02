@@ -1,6 +1,6 @@
 from django.db import models
 
-from Account.models import Users
+from apps.Account.models import Users
 
 
 class UserPrivacy(models.Model):

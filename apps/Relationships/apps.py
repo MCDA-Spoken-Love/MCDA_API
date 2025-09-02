@@ -1,6 +1,6 @@
 from django.apps import AppConfig
 
 
-class PrivacyConfig(AppConfig):
+class RelationshipsConfig(AppConfig):
     default_auto_field = 'django.db.models.BigAutoField'
-    name = 'Privacy'
+    name = 'apps.Relationships'

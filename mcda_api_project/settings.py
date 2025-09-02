@@ -60,9 +60,9 @@ INSTALLED_APPS = [
     'allauth.socialaccount',
     'dj_rest_auth',
     'dj_rest_auth.registration',
-    'Account',
-    'Privacy',
-    'Relationships'
+    'apps.Account',
+    'apps.Privacy',
+    'apps.Relationships'
 ]
 
 SITE_ID = 1
@@ -201,8 +201,8 @@ SIMPLE_JWT = {
 REST_AUTH = {
     "USE_JWT": True,
     "JWT_AUTH_HTTPONLY": False,  # Makes sure refresh token is sent
-    'REGISTER_SERIALIZER': 'Account.serializer.CustomRegisterSerializer',
-    'USER_DETAILS_SERIALIZER': 'Account.serializer.CustomUserDetailsSerializer',
+    'REGISTER_SERIALIZER': 'apps.Account.serializer.CustomRegisterSerializer',
+    'USER_DETAILS_SERIALIZER': 'apps.Account.serializer.CustomUserDetailsSerializer',
 }
 
 REST_AUTH_REGISTER_SERIALIZERS = {

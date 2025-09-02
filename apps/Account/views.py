@@ -6,7 +6,7 @@ from rest_framework.decorators import (
 )
 from rest_framework.response import Response
 
-from Account.models import Users
+from apps.Account.models import Users
 
 
 @api_view(['GET'])

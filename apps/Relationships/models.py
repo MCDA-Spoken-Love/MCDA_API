@@ -2,7 +2,7 @@ from enum import Enum
 
 from django.db import models
 
-from Account.models import Users
+from apps.Account.models import Users
 
 
 class Status(Enum):

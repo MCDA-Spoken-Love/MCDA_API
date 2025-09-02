@@ -10,9 +10,9 @@ from rest_framework.decorators import (
 )
 from rest_framework.response import Response
 
-from Account.models import Users
-from Relationships.models import Relationship, RelationshipRequest
-from Relationships.serializer import RelationshipSerializer
+from apps.Account.models import Users
+from apps.Relationships.models import Relationship, RelationshipRequest
+from apps.Relationships.serializer import RelationshipSerializer
 
 channel_layer = get_channel_layer()
 

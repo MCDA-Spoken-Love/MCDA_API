@@ -6,9 +6,9 @@ from django.urls import reverse
 from rest_framework import status
 from rest_framework.test import APIClient, APITestCase
 
-from Account.models import Users
-from Relationships.models import Relationship, RelationshipRequest, Status
-from Relationships.serializer import RelationshipSerializer
+from apps.Account.models import Users
+from apps.Relationships.models import Relationship, RelationshipRequest, Status
+from apps.Relationships.serializer import RelationshipSerializer
 
 
 class StatusEnumTest(TestCase):

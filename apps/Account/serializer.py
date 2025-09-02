@@ -3,9 +3,9 @@ from allauth.utils import get_username_max_length
 from django.db import transaction
 from rest_framework import serializers
 
-from Account.models import Gender, Sexuality, Users
-from Account.utils import email_to_code
-from Privacy.models import UserPrivacy
+from apps.Account.models import Gender, Sexuality, Users
+from apps.Account.utils import email_to_code
+from apps.Privacy.models import UserPrivacy
 
 
 class CustomRegisterSerializer(serializers.Serializer):
