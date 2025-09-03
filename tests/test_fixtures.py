@@ -3,9 +3,9 @@ Test fixtures and sample data for the MCDA API project.
 """
 from datetime import date, timedelta
 
-from Account.models import Users
-from Privacy.models import UserPrivacy
-from Relationships.models import Relationship, RelationshipRequest
+from apps.Account.models import Users
+from apps.Privacy.models import UserPrivacy
+from apps.Relationships.models import Relationship, RelationshipRequest
 
 
 class TestDataFactory:

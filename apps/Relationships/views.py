@@ -87,7 +87,7 @@ class RespondRelationshipRequestView(APIView):
             else:
                 partner = Users.objects.get(
                     pk=relationship_request.requester.id)
-                if accept or str(accept).lower() == 'true':
+                if accept is True or str(accept).lower() == 'true':
                     relationship_start_date = request.data.get(
                         'relationship_start_date') or today
                     Relationship.objects.create(
@@ -96,8 +96,8 @@ class RespondRelationshipRequestView(APIView):
                         relationship_start_date=relationship_start_date
                     )
 
-                    RelationshipRequest.objects.filter(
-                        pk=pk).update(status='ACCEPTED')
+                    # Delete the accepted request since relationship is now created
+                    RelationshipRequest.objects.filter(pk=pk).delete()
 
                     send_socket_message(f"user_{partner.id}", 'relationship_request_notification', {
                         'message': f'{current_user.first_name} said yes! Congrats!',
@@ -107,7 +107,7 @@ class RespondRelationshipRequestView(APIView):
 
                     return Response({"message": f"{current_user.first_name} and {partner.first_name} are now dating! Congratulations!"}, status=status.HTTP_200_OK)
 
-                elif not accept or str(accept).lower() == 'false':
+                elif accept is False or str(accept).lower() == 'false':
                     RelationshipRequest.objects.filter(
                         pk=pk).update(status='REJECTED')
 

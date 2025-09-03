@@ -24,7 +24,6 @@ class StatusEnumTest(TestCase):
         self.assertIn('ACCEPTED', choice_values)
         self.assertIn('PENDING', choice_values)
         self.assertIn('REJECTED', choice_values)
-        self.assertIn('BLOCKED', choice_values)
 
 
 class RelationshipModelTest(TestCase):

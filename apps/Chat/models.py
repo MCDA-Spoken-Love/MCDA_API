@@ -1,16 +1,9 @@
 import uuid
-from datetime import datetime, time
+from datetime import time
 
 from django.db import models
 
 from apps.Account.models import Users
-
-
-def default_chat_open_time():
-    now = datetime.now()
-    return datetime.combine(now.date(), time(20, 0))
-
-# Create your models here.
 
 
 class Chat(models.Model):
@@ -21,14 +14,16 @@ class Chat(models.Model):
         Users, on_delete=models.CASCADE, related_name='chats_as_user_two')
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
-    wallpaper = models.CharField(max_length=255, null=True)
     chat_duration = models.IntegerField(
         default=60)  # duration in minutes
-    chat_open_time = models.DateTimeField(
-        default=default_chat_open_time())
+    chat_open_time = models.TimeField(
+        default=time(20, 0))
 
-    def __str__(self):
-        return f"Chat between {self.user_one.username} and {self.user_two.username}"
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(
+                fields=['user_one', 'user_two'], name='unique_chat')
+        ]
 
 
 class ChatMessages(models.Model):

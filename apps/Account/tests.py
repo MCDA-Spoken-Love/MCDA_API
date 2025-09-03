@@ -3,9 +3,12 @@ from django.urls import reverse
 from rest_framework import status
 from rest_framework.test import APIClient, APITestCase
 
-from Account.models import Gender, Sexuality, Users
-from Account.serializer import CustomRegisterSerializer, CustomUserDetailsSerializer
-from Account.utils import email_to_code
+from apps.Account.models import Gender, Sexuality, Users
+from apps.Account.serializer import (
+    CustomRegisterSerializer,
+    CustomUserDetailsSerializer,
+)
+from apps.Account.utils import email_to_code
 
 
 class GenderEnumTest(TestCase):
@@ -194,6 +197,7 @@ class AccountViewsTest(APITestCase):
 
     def test_get_user_by_filter_with_username(self):
         """Test get_user_by_filter endpoint with username"""
+        self.client.force_authenticate(user=self.user)
         url = reverse('get_user_by_username')
         response = self.client.get(url, {'username': 'testuser'})
 
@@ -202,6 +206,7 @@ class AccountViewsTest(APITestCase):
 
     def test_get_user_by_filter_with_email(self):
         """Test get_user_by_filter endpoint with email"""
+        self.client.force_authenticate(user=self.user)
         url = reverse('get_user_by_username')
         response = self.client.get(url, {'email': 'test@example.com'})
 
@@ -210,6 +215,7 @@ class AccountViewsTest(APITestCase):
 
     def test_get_user_by_filter_with_both_params(self):
         """Test get_user_by_filter endpoint with both username and email"""
+        self.client.force_authenticate(user=self.user)
         url = reverse('get_user_by_username')
         response = self.client.get(url, {
             'username': 'testuser',
@@ -221,6 +227,7 @@ class AccountViewsTest(APITestCase):
 
     def test_get_user_by_filter_no_params(self):
         """Test get_user_by_filter endpoint without parameters"""
+        self.client.force_authenticate(user=self.user)
         url = reverse('get_user_by_username')
         response = self.client.get(url)
 
@@ -229,6 +236,7 @@ class AccountViewsTest(APITestCase):
 
     def test_get_user_by_filter_nonexistent_user(self):
         """Test get_user_by_filter endpoint with nonexistent user"""
+        self.client.force_authenticate(user=self.user)
         url = reverse('get_user_by_username')
         response = self.client.get(url, {'username': 'nonexistent'})
 
