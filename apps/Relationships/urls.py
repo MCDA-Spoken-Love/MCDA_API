@@ -3,9 +3,10 @@ from django.urls import path
 from . import views
 
 urlpatterns = [
-    path('relationship/request/', views.create_relationship_request,
+    path('relationship/request/', views.CreateRelationshipRequestView.as_view(),
          name='create_relationship_request'),
     path('relationship/respond/<int:pk>/',
-         views.respond_relationship_request, name='respond_relationship_request'),
-    path('relationship/', views.manage_relationships, name='manage_relationship')
+         views.RespondRelationshipRequestView.as_view(), name='respond_relationship_request'),
+    path('relationship/', views.ManageRelationshipsView.as_view(),
+         name='manage_relationship')
 ]

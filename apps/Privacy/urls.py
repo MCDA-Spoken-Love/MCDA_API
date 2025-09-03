@@ -1,13 +1,9 @@
-
 from django.urls import path
 
-from . import views
+from .views import PrivacySettingsView, ToggleLastSeenView, ToggleStatusVisibilityView
 
 urlpatterns = [
-    path('privacy/', views.get_privacy_settings,
-         name='get_privacy_settings'),
-    path('privacy/toggle/status/', views.toggle_status_visibility,
-         name='toggle_status_visibility'),
-    path('privacy/toggle/last_seen/',
-         views.toggle_last_seen, name='toggle_last_seen')
+    path('privacy-settings/', PrivacySettingsView.as_view()),
+    path('toggle-status-visibility/', ToggleStatusVisibilityView.as_view()),
+    path('toggle-last-seen/', ToggleLastSeenView.as_view()),
 ]
