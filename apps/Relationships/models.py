@@ -1,6 +1,7 @@
 from enum import Enum
 
 from django.db import models
+from django_mysql.models import EnumField
 
 from apps.Account.models import Users
 
@@ -9,16 +10,13 @@ class Status(Enum):
     ACCEPTED = 'ACCEPTED'
     PENDING = 'PENDING'
     REJECTED = 'REJECTED'
-    BLOCKED = 'BLOCKED'
-    NONBINARY = 'NONBINARY'
-    INTERSEX = 'INTERSEX'
-    AGENDER = 'AGENDER'
-    OTHER = 'OTHER'
-    PREFERNOTTOSAY = 'PREFERNOTTOSAY'
 
     @classmethod
     def choices(cls):
         return [(key.value, key.name) for key in cls]
+
+
+STATUS_CHOICES = [e.value for e in Status]
 
 
 class Relationship(models.Model):
@@ -44,7 +42,7 @@ class Relationship(models.Model):
 
 class RelationshipRequest(models.Model):
     id = models.AutoField(primary_key=True)
-    status = models.CharField(max_length=100, choices=Status.choices())
+    status = EnumField(choices=STATUS_CHOICES, default=Status.PENDING)
     requester = models.ForeignKey(
         Users,
         on_delete=models.CASCADE,

@@ -62,7 +62,8 @@ INSTALLED_APPS = [
     'dj_rest_auth.registration',
     'apps.Account',
     'apps.Privacy',
-    'apps.Relationships'
+    'apps.Relationships',
+    'apps.Chat',
 ]
 
 SITE_ID = 1

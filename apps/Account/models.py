@@ -3,6 +3,7 @@ from enum import Enum
 
 from django.contrib.auth.models import AbstractUser
 from django.db import models
+from django_mysql.models import EnumField
 
 
 class Gender(Enum):
@@ -37,55 +38,21 @@ class Sexuality(Enum):
         return [(key.value, key.name) for key in cls]
 
 
+GENDER_CHOICES = [e.value for e in Gender]
+SEXUALITY_CHOICES = [e.value for e in Sexuality]
+
+
 class Users(AbstractUser):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     password = models.CharField(max_length=255)
     email = models.EmailField(max_length=255, unique=True)
-    gender = models.CharField(
-        max_length=100, choices=Gender.choices(), null=True)
-    sexuality = models.CharField(
-        max_length=100, choices=Sexuality.choices(), null=True)
+    gender = EnumField(
+        choices=GENDER_CHOICES, null=True)
+    sexuality = EnumField(
+        choices=SEXUALITY_CHOICES, null=True)
     connection_code = models.CharField(max_length=255, unique=True)
     has_accepted_terms_and_conditions = models.BooleanField(default=False)
     has_accepted_privacy_policy = models.BooleanField(default=False)
 
     def __str__(self):
         return self.username
-
-
-# class ChatTheme(Enum):
-#     LIGHT = 'LIGHT'
-#     DARK = 'DARK'
-#     SYSTEM = 'SYSTEM'
-
-#     @classmethod
-#     def choices(cls):
-#         return [(key.value, key.name) for key in cls]
-
-
-# class Chat(models.Model):
-#     id = models.AutoField(primary_key=True)
-#     first_user = models.ForeignKey(
-#         Users, related_name='first_user', on_delete=models.CASCADE)
-#     second_user = models.ForeignKey(
-#         Users, related_name='second_user', on_delete=models.CASCADE)
-#     color_scheme = models.CharField(max_length=255, null=True)
-#     chat_duration = models.IntegerField(null=True)
-#     chat_open_time = models.DateTimeField(null=True)
-#     wallpaper = models.CharField(max_length=255, null=True)
-#     theme = models.CharField(
-#         max_length=10, choices=ChatTheme.choices(), null=True)
-
-#     def __str__(self):
-#         return f"Chat between {self.firstUser.username} and {self.secondUser.username}"
-
-
-# class ChatMessages(models.Model):
-#     id = models.AutoField(primary_key=True)
-#     chat = models.ForeignKey(Chat, on_delete=models.CASCADE)
-#     sender = models.ForeignKey(Users, on_delete=models.CASCADE)
-#     message = models.TextField()
-#     timestamp = models.DateTimeField(auto_now_add=True)
-
-#     def __str__(self):
-#         return f"Message from {self.sender.username} in chat {self.chat.id}"
