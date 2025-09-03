@@ -49,12 +49,13 @@ class CreateRelationshipRequestView(APIView):
             if not connection_code:
                 return Response({"message": "Please provide a connection code"}, status=status.HTTP_400_BAD_REQUEST)
             partner = Users.objects.get(connection_code=connection_code)
-            request_obj = RelationshipRequest.objects.create(
+            if partner.id == current_user.id:
+                return Response({"message": "Please provide a user code other than your own"}, status=status.HTTP_400_BAD_REQUEST)
+            RelationshipRequest.objects.get_or_create(
                 requester=Users.objects.get(pk=current_user.id),
                 receiver=Users.objects.get(pk=partner.id),
                 status='PENDING'
             )
-            request_obj.save()
             send_socket_message(f"user_{partner.id}", 'relationship_request_notification', {
                 'message': f'{current_user.first_name} has asked you to be in a loving relationship with you',
                 'requester_id': str(current_user.id),
@@ -94,6 +95,7 @@ class RespondRelationshipRequestView(APIView):
                         user_two=relationship_request.receiver,
                         relationship_start_date=relationship_start_date
                     )
+
                     RelationshipRequest.objects.filter(
                         pk=pk).update(status='ACCEPTED')
 

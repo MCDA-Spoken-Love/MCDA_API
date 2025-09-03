@@ -65,7 +65,7 @@ Activate your virtual environment and run:
 
 ```bash
 source venv/bin/activate
-daphne mcda_api_project.asgi:application
+uvicorn mcda_api_project.asgi:application --reload
 ```
 
 ### 7. Run tests

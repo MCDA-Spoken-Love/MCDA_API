@@ -33,6 +33,16 @@ class Relationship(models.Model):
     )
     relationship_start_date = models.DateField(null=True)
 
+    def save(self, *args, **kwargs):
+        is_new = self.pk is None
+        super().save(*args, **kwargs)
+        if is_new:
+            from apps.Chat.models import Chat
+            Chat.objects.get_or_create(
+                user_one=self.user_one,
+                user_two=self.user_two
+            )
+
     class Meta:
         constraints = [
             models.UniqueConstraint(

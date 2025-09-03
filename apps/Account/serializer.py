@@ -5,7 +5,6 @@ from rest_framework import serializers
 
 from apps.Account.models import Gender, Sexuality, Users
 from apps.Account.utils import email_to_code
-from apps.Privacy.models import UserPrivacy
 
 
 class CustomRegisterSerializer(serializers.Serializer):
@@ -92,8 +91,6 @@ class CustomRegisterSerializer(serializers.Serializer):
         self.custom_signup(request, user)
         user.save()
 
-        privacy = UserPrivacy(user=user)
-        privacy.save()
         return user
 
 

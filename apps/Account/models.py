@@ -54,5 +54,10 @@ class Users(AbstractUser):
     has_accepted_terms_and_conditions = models.BooleanField(default=False)
     has_accepted_privacy_policy = models.BooleanField(default=False)
 
+    def save(self, *args, **kwargs):
+        super().save(*args, **kwargs)
+        from apps.Privacy.models import UserPrivacy
+        UserPrivacy.objects.get_or_create(user=self)
+
     def __str__(self):
         return self.username
