@@ -118,7 +118,8 @@ class CustomUserDetailsSerializer(serializers.ModelSerializer):
             return {
                 "relationship_start_date": rel.relationship_start_date,
                 "partner": {
-                    "name": partner.username,
+                    "name": partner.first_name + ' ' + partner.last_name,
+                    "username": partner.username,
                     "id": partner.id
                 }
             }

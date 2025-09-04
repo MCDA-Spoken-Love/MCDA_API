@@ -6,12 +6,13 @@ from dotenv import load_dotenv
 
 load_dotenv(dotenv_path='.env')
 token = os.getenv('USER_TOKEN')
-uri = f"ws://localhost:8000/ws/relationship-requests/?token={token}"
+chat_uri = f"ws://localhost:8000/ws/chat/?token={token}"
+relationship_uri = f"ws://localhost:8000/ws/relationship-requests/?token={token}"
 
 
 async def listen():
     async with websockets.connect(
-        uri,
+        chat_uri,
         origin="http://localhost:8000"
     ) as websocket:
         print("Connected to WebSocket.")

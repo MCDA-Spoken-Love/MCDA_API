@@ -7,6 +7,7 @@ from rest_framework.views import APIView
 
 from apps.Account.serializer import CustomUserDetailsSerializer
 from apps.Chat.serializer import ChatMessagesSerializer, ChatSerializer
+from services.socket_message import send_socket_message
 
 from .models import Chat, ChatMessages
 
@@ -75,15 +76,23 @@ class MessagesView(APIView):
                 return Response({"message": f"{user_serialized.username} is not with anyone and cannot send a message"}, status=status.HTTP_403_BAD_REQUEST)
 
             relationship = user_serialized["relationship"]
+            partner_id = relationship["partner"]["id"]
+            partner_name = relationship['partner']['name']
             if (
-                relationship["partner"]["id"] != chat["user_one"] and
-                relationship["partner"]["id"] != chat["user_two"]
+                partner_id != chat["user_one"] and
+                partner_id != chat["user_two"]
             ):
                 return Response({"message": "You can only contact your partner"}, status=status.HTTP_403_BAD_REQUEST)
 
             new_message = ChatMessages.objects.create(chat_id=chat.get(
                 'id'), sender=current_user, message=request.data.get('message'))
-            new_message_data = ChatMessagesSerializer(new_message)
-            return Response(new_message_data.data)
+            new_message_data = ChatMessagesSerializer(new_message).data
+
+            send_socket_message(
+                f'user_{partner_id}', "new_message_notification", {
+                    'message': new_message_data['message'],
+                    "sender": partner_name
+                })
+            return Response(new_message_data)
         except Exception as e:
             return Response({"message": "Error sending a new chat message", "full_error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
