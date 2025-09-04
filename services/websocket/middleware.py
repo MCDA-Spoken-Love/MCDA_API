@@ -1,8 +1,14 @@
-from urllib.parse import parse_qs
+import os  # noqa: E402
 
-from channels.db import database_sync_to_async
-from django.contrib.auth.models import AnonymousUser
-from rest_framework.authtoken.models import Token
+os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'mcda_api_project.settings')  # noqa: E402
+import django  # noqa: E402
+
+django.setup()  # noqa: E402
+from urllib.parse import parse_qs  # noqa: E402
+
+from channels.db import database_sync_to_async  # noqa: E402
+from django.contrib.auth.models import AnonymousUser  # noqa: E402
+from rest_framework.authtoken.models import Token  # noqa: E402
 
 
 class TokenAuthMiddleware:

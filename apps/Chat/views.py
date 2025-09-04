@@ -1,11 +1,28 @@
+import logging
+
 from django.db.models import Q
 from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-from apps.Chat.serializer import ChatSerializer
+from apps.Account.serializer import CustomUserDetailsSerializer
+from apps.Chat.serializer import ChatMessagesSerializer, ChatSerializer
 
-from .models import Chat
+from .models import Chat, ChatMessages
+
+logger = logging.getLogger("django")
+
+
+def query_chat(user, patch_data=None):
+    if patch_data is None:
+        patch_data = {}
+    try:
+        chat = Chat.objects.get(Q(user_one_id=user) | Q(user_two_id=user))
+        chat_serializer = ChatSerializer(chat, data=patch_data, partial=True)
+        chat_serializer.is_valid(raise_exception=True)
+        return chat_serializer
+    except Exception as e:
+        return Response({"message": "Error fetching chat", "full_error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
 
 class ChatView(APIView):
@@ -14,11 +31,8 @@ class ChatView(APIView):
     def get(self, request):
         current_user = request.user
         try:
-            chat = Chat.objects.filter(
-                Q(user_one_id=current_user) | Q(user_two_id=current_user)
-            )
-            serializer = self.serializer_class(chat, many=True)
-            return Response(serializer.data[0])
+            chat = query_chat(current_user)
+            return Response(chat.data)
         except Exception as e:
             return Response({"message": "Error fetching chat view", "full_error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
@@ -27,15 +41,49 @@ class ChatView(APIView):
         try:
             if request.data.get('user_one') or request.data.get('user_two') or request.data.get('id'):
                 return Response({"message": "You cannot update the chat users or id"}, status=status.HTTP_400_BAD_REQUEST)
+            chat = query_chat(current_user, request.data)
+            chat.save()
 
-            chat = Chat.objects.get(
-                Q(user_one_id=current_user) | Q(user_two_id=current_user)
-            )
-            serializer = self.serializer_class(
-                chat, data=request.data, partial=True)
-            serializer.is_valid(raise_exception=True)
-            serializer.save()
-            return Response(serializer.data)
+            return Response(chat.data)
 
         except Exception as e:
             return Response({"message": "Error updating chat", "full_error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
+
+
+class MessagesView(APIView):
+
+    def get(self, request):
+        current_user = request.user
+        try:
+            chat = query_chat(current_user).data
+
+            chat_messages = ChatMessages.objects.filter(
+                chat_id=chat.get('id'))
+            messages_serializer = ChatMessagesSerializer(
+                chat_messages, many=True).data
+
+            return Response(messages_serializer)
+        except Exception as e:
+            return Response({"message": "Error fetching chat messages", "full_error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
+
+    def post(self, request):
+        current_user = request.user
+        try:
+            chat = query_chat(current_user).data
+            user_serialized = CustomUserDetailsSerializer(current_user).data
+            if user_serialized["relationship"] is None:
+                return Response({"message": f"{user_serialized.username} is not with anyone and cannot send a message"}, status=status.HTTP_403_BAD_REQUEST)
+
+            relationship = user_serialized["relationship"]
+            if (
+                relationship["partner"]["id"] != chat["user_one"] and
+                relationship["partner"]["id"] != chat["user_two"]
+            ):
+                return Response({"message": "You can only contact your partner"}, status=status.HTTP_403_BAD_REQUEST)
+
+            new_message = ChatMessages.objects.create(chat_id=chat.get(
+                'id'), sender=current_user, message=request.data.get('message'))
+            new_message_data = ChatMessagesSerializer(new_message)
+            return Response(new_message_data.data)
+        except Exception as e:
+            return Response({"message": "Error sending a new chat message", "full_error": str(e)}, status=status.HTTP_400_BAD_REQUEST)

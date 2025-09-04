@@ -4,6 +4,8 @@ import os
 
 import django
 
+from services.websocket.middleware import TokenAuthMiddleware
+
 
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'mcda_api_project.settings')
 django.setup()
@@ -13,7 +15,6 @@ from channels.security.websocket import AllowedHostsOriginValidator  # noqa: E40
 from django.core.asgi import get_asgi_application # noqa: E402
 
 from apps.Relationships.routing import websocket_urlpatterns # noqa: E402
-from apps.Relationships.middleware import TokenAuthMiddleware  # noqa: E402
 
 
 application = get_asgi_application()

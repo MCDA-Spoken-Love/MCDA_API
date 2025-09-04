@@ -1,6 +1,7 @@
 from allauth.account.adapter import get_adapter
 from allauth.utils import get_username_max_length
 from django.db import transaction
+from django.db.models import Q
 from rest_framework import serializers
 
 from apps.Account.models import Gender, Sexuality, Users
@@ -95,8 +96,31 @@ class CustomRegisterSerializer(serializers.Serializer):
 
 
 class CustomUserDetailsSerializer(serializers.ModelSerializer):
+    relationship = serializers.SerializerMethodField()
+
     class Meta:
         model = Users
         exclude = ('password',)  # Exclude password for security
         read_only_fields = ('id', 'date_joined', 'last_login',
                             'is_superuser', 'is_staff')
+
+    def get_relationship(self, obj):
+        from apps.Relationships.models import Relationship
+        rel = Relationship.objects.filter(
+            Q(user_one=obj) | Q(user_two=obj)
+        ).first()
+        if rel:
+            if rel.user_one.username == obj.username:
+                partner = rel.user_two
+            else:
+                partner = rel.user_one
+
+            return {
+                "relationship_start_date": rel.relationship_start_date,
+                "partner": {
+                    "name": partner.username,
+                    "id": partner.id
+                }
+            }
+        else:
+            return None

@@ -96,9 +96,8 @@ class RespondRelationshipRequestView(APIView):
                         relationship_start_date=relationship_start_date
                     )
 
-                    # Delete the accepted request since relationship is now created
-                    RelationshipRequest.objects.filter(pk=pk).delete()
-
+                    RelationshipRequest.objects.filter(
+                        pk=pk).update(status='ACCEPTED')
                     send_socket_message(f"user_{partner.id}", 'relationship_request_notification', {
                         'message': f'{current_user.first_name} said yes! Congrats!',
                         'requester_id': str(current_user.id),

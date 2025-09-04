@@ -4,6 +4,7 @@ from datetime import time
 from django.db import models
 
 from apps.Account.models import Users
+from apps.Relationships.models import Relationship
 
 
 class Chat(models.Model):
@@ -12,6 +13,8 @@ class Chat(models.Model):
         Users, on_delete=models.CASCADE, related_name='chats_as_user_one')
     user_two = models.ForeignKey(
         Users, on_delete=models.CASCADE, related_name='chats_as_user_two')
+    relationship = models.ForeignKey(
+        Relationship, on_delete=models.CASCADE, related_name='chat_relationship', null=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     chat_duration = models.IntegerField(

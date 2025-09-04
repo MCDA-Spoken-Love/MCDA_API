@@ -38,9 +38,12 @@ class Relationship(models.Model):
         super().save(*args, **kwargs)
         if is_new:
             from apps.Chat.models import Chat
+            from apps.Relationships.models import Relationship
+            relationship = Relationship.objects.get(id=self.pk)
             Chat.objects.get_or_create(
                 user_one=self.user_one,
-                user_two=self.user_two
+                user_two=self.user_two,
+                relationship=relationship
             )
 
     class Meta:
