@@ -2,11 +2,13 @@ import logging
 
 from django.db.models import Q
 from rest_framework import status
+from rest_framework.generics import ListAPIView
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from apps.Account.serializer import CustomUserDetailsSerializer
 from apps.Chat.serializer import ChatMessagesSerializer, ChatSerializer
+from services.pagination import CursorPagination
 from services.socket_message import send_socket_message
 
 from .models import Chat, ChatMessages
@@ -96,3 +98,15 @@ class MessagesView(APIView):
             return Response(new_message_data)
         except Exception as e:
             return Response({"message": "Error sending a new chat message", "full_error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
+
+
+class MessageList(ListAPIView):
+    serializer_class = ChatMessagesSerializer
+    pagination_class = CursorPagination
+
+    def get_queryset(self):
+        current_user = self.request.user
+        chat = query_chat(current_user).data
+
+        return ChatMessages.objects.filter(
+            chat_id=chat.get('id'))
