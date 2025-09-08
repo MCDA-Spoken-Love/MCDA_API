@@ -5,7 +5,7 @@ import websockets
 from dotenv import load_dotenv
 
 load_dotenv(dotenv_path='.env')
-token = os.getenv('USER_TWO_TOKEN')
+token = os.getenv('USER_ONE_TOKEN')
 chat_uri = f"ws://localhost:8000/ws/chat/?token={token}"
 relationship_uri = f"ws://localhost:8000/ws/relationship-requests/?token={token}"
 

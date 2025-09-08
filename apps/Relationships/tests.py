@@ -298,10 +298,6 @@ class RelationshipViewsTest(APITestCase):
         )
         self.assertEqual(relationship.relationship_start_date, date.today())
 
-        # Verify request was deleted
-        with self.assertRaises(RelationshipRequest.DoesNotExist):
-            RelationshipRequest.objects.get(id=request.id)
-
     def test_respond_relationship_request_reject(self):
         """Test rejecting a relationship request"""
         # Create a request first

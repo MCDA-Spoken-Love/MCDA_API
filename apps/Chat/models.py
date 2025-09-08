@@ -2,6 +2,7 @@ import uuid
 from datetime import time
 
 from django.db import models
+from django.db.models import Q
 
 from apps.Account.models import Users
 from apps.Relationships.models import Relationship
@@ -33,8 +34,14 @@ class ChatMessages(models.Model):
     id = models.AutoField(primary_key=True)
     chat = models.ForeignKey(Chat, on_delete=models.CASCADE)
     sender = models.ForeignKey(Users, on_delete=models.CASCADE)
-    message = models.TextField()
+    message = models.TextField(max_length=1000)
     timestamp = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        constraints = [
+            models.CheckConstraint(condition=~Q(message=""),
+                                   name="message_not_empty"),
+        ]
 
     def __str__(self):
         return f"Message from {self.sender.username} in chat {self.chat.id}"

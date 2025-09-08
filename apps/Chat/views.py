@@ -42,8 +42,8 @@ class ChatView(APIView):
     def patch(self, request):
         current_user = request.user
         try:
-            if request.data.get('user_one') or request.data.get('user_two') or request.data.get('id'):
-                return Response({"message": "You cannot update the chat users or id"}, status=status.HTTP_400_BAD_REQUEST)
+            if request.data.get('user_one') or request.data.get('user_two') or request.data.get('id') or request.data.get('relationship'):
+                return Response({"message": "You cannot update the chat users, relationship or id"}, status=status.HTTP_400_BAD_REQUEST)
             chat = query_chat(current_user, request.data)
             chat.save()
 
@@ -75,16 +75,11 @@ class MessagesView(APIView):
             chat = query_chat(current_user).data
             user_serialized = CustomUserDetailsSerializer(current_user).data
             if user_serialized["relationship"] is None:
-                return Response({"message": f"{user_serialized.username} is not with anyone and cannot send a message"}, status=status.HTTP_403_BAD_REQUEST)
+                return Response({"message": f"{user_serialized['username']} is not with anyone and cannot send a message"}, status=status.HTTP_403_FORBIDDEN)
 
             relationship = user_serialized["relationship"]
             partner_id = relationship["partner"]["id"]
             partner_name = relationship['partner']['name']
-            if (
-                partner_id != chat["user_one"] and
-                partner_id != chat["user_two"]
-            ):
-                return Response({"message": "You can only contact your partner"}, status=status.HTTP_403_BAD_REQUEST)
 
             new_message = ChatMessages.objects.create(chat_id=chat.get(
                 'id'), sender=current_user, message=request.data.get('message'))
