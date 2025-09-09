@@ -23,7 +23,8 @@ router = DefaultRouter()
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('api/', include('Account.urls')),
-    path('api/', include('Privacy.urls')),
-    path('api/', include('Relationships.urls'))
+    path('api/', include('apps.Account.urls')),
+    path('api/', include('apps.Privacy.urls')),
+    path('api/', include('apps.Relationships.urls')),
+    path('api/', include('apps.Chat.urls')),
 ]

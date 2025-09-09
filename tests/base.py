@@ -6,8 +6,8 @@ from django.test import TestCase
 from rest_framework import status
 from rest_framework.test import APIClient, APITestCase
 
-from Account.models import Users
-from Privacy.models import UserPrivacy
+from apps.Account.models import Users
+from apps.Privacy.models import UserPrivacy
 
 
 class BaseTestCase(TestCase):
