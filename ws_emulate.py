@@ -6,7 +6,8 @@ from dotenv import load_dotenv
 
 load_dotenv(dotenv_path='.env')
 token = os.getenv('USER_TWO_TOKEN')
-chat_uri = f"ws://localhost:8000/ws/chat/?token={token}"
+chat_id = os.getenv('CHAT_ID')
+chat_uri = f"ws://localhost:8000/ws/chat/{chat_id}/?token={token}"
 relationship_uri = f"ws://localhost:8000/ws/relationship-requests/?token={token}"
 
 

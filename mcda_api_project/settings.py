@@ -128,10 +128,12 @@ DATABASES = {
 }
 
 # Test database configuration - uses SQLite for faster tests
-if 'test' in sys.argv:
-    DATABASES['default'] = {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': ':memory:',
+if 'test' in sys.argv or 'pytest' in sys.modules:
+    # Use in-memory channel layer for tests to avoid event loop issues
+    CHANNEL_LAYERS = {
+        "default": {
+            "BACKEND": "channels.layers.InMemoryChannelLayer",
+        },
     }
 
 # Password validation
