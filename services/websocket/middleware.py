@@ -7,29 +7,56 @@ django.setup()  # noqa: E402
 from urllib.parse import parse_qs  # noqa: E402
 
 from channels.db import database_sync_to_async  # noqa: E402
+from django.contrib.auth import get_user_model  # noqa: E402
 from django.contrib.auth.models import AnonymousUser  # noqa: E402
-from rest_framework.authtoken.models import Token  # noqa: E402
+from rest_framework_simplejwt.tokens import AccessToken  # noqa: E402
+
+User = get_user_model()
 
 
-class TokenAuthMiddleware:
+class JWTAuthMiddleware:
     def __init__(self, app):
         self.app = app
 
     async def __call__(self, scope, receive, send):
-        query_string = scope.get('query_string', b'').decode()
-        params = parse_qs(query_string)
-        token_key = params.get('token')
-        if token_key:
-            scope['user'] = await self.get_user(token_key[0])
-        else:
-            scope['user'] = AnonymousUser()
+        token = None
+
+        # Check Authorization header first
+        for name, value in scope.get('headers', []):
+            if name == b"authorization":
+                parts = value.decode().split()
+                if len(parts) == 2 and parts[0].lower() == "bearer":
+                    token = parts[1]
+                    break
+
+        # If no token in header, check query string
+        if token is None:
+            query_string = scope.get('query_string', b'').decode()
+            params = parse_qs(query_string)
+            token_list = params.get('token')
+            # Check if list exists and has a non-empty value
+            if token_list and token_list[0]:
+                token = token_list[0]
+
+        user = AnonymousUser()
+        if token:  # Now checking if token string exists and is not empty
+            try:
+                # Log first 20 chars for debugging
+                access = AccessToken(token)
+                user_id = access.get('user_id')
+                if user_id:
+                    user = await get_user_from_id(user_id)
+            except Exception as e:
+                print(f'Token validation failed: {e}')
+                user = AnonymousUser()
+
+        scope['user'] = user
         return await self.app(scope, receive, send)
 
-    @database_sync_to_async
-    def get_user(self, token_key):
-        try:
-            user = Token.objects.get(key=token_key).user
-            return user
 
-        except Token.DoesNotExist:
-            return AnonymousUser()
+@database_sync_to_async
+def get_user_from_id(user_id):
+    try:
+        return User.objects.get(pk=user_id)
+    except User.DoesNotExist:
+        return AnonymousUser()

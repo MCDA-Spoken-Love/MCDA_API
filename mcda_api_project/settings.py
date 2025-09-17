@@ -33,12 +33,15 @@ SECRET_KEY = 'django-insecure-3s(m&w=sg68_0cira5t2)en$wla#ybn^rie^@d-#yv7)dc4bkj
 DEBUG = True
 
 ALLOWED_HOSTS = [
-    '10.0.3.2',
     'localhost',
-    '10.0.2.2',
+    '127.0.0.1',
+    '177.18.229.106:0',
+    '10.0.2.2',      # Android emulator
+    '10.0.3.2',      # Alternative Android emulator IP
+    '192.168.1.*',   # Local network (if needed)
     '.ngrok-free.app',
-    "127.0.0.1",
-    "[::1]",]
+    # Add your production domain here,
+]
 
 
 # Application definition
