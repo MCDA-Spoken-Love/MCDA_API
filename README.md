@@ -36,7 +36,7 @@ DB_USER=your_db_user
 DB_USER_PASSWORD=your_db_password
 DB_HOST=localhost
 DB_PORT=3306
-USER_TOKEN=your_api_token
+USER_TOKEN=your_api_token # OPTIONAL: For WebSocket authentication in test mode
 ```
 
 ### 3. Start Redis (for WebSocket support)
