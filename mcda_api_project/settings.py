@@ -15,6 +15,7 @@ import sys
 from datetime import timedelta
 from pathlib import Path
 
+import cloudinary
 from dotenv import load_dotenv
 
 load_dotenv()
@@ -22,24 +23,28 @@ load_dotenv()
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
+CLOUDINARY_API_KEY = os.environ.get("CLOUDINARY_API_KEY")
+CLOUDINARY_API_SECRET = os.environ.get("CLOUDINARY_API_SECRET")
+CLOUDINARY_CLOUD_NAME = os.environ.get("CLOUDINARY_CLOUD_NAME")
+
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/5.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-3s(m&w=sg68_0cira5t2)en$wla#ybn^rie^@d-#yv7)dc4bkj'
+SECRET_KEY = "django-insecure-3s(m&w=sg68_0cira5t2)en$wla#ybn^rie^@d-#yv7)dc4bkj"
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
 ALLOWED_HOSTS = [
-    'localhost',
-    '127.0.0.1',
-    '177.18.229.106:0',
-    '10.0.2.2',      # Android emulator
-    '10.0.3.2',      # Alternative Android emulator IP
-    '192.168.1.*',   # Local network (if needed)
-    '.ngrok-free.app',
+    "localhost",
+    "127.0.0.1",
+    "177.18.229.106:0",
+    "10.0.2.2",  # Android emulator
+    "10.0.3.2",  # Alternative Android emulator IP
+    "192.168.1.*",  # Local network (if needed)
+    ".ngrok-free.app",
     # Add your production domain here,
 ]
 
@@ -48,59 +53,62 @@ ALLOWED_HOSTS = [
 
 INSTALLED_APPS = [
     "daphne",
-    'django.contrib.admin',
-    'django.contrib.auth',
-    'django.contrib.contenttypes',
-    'django.contrib.sessions',
-    'django.contrib.messages',
-    'django.contrib.staticfiles',
-    'django.contrib.sites',
-    'corsheaders',
-    'rest_framework',
-    'rest_framework.authtoken',
-    'allauth',
-    'allauth.account',
-    'allauth.socialaccount',
-    'dj_rest_auth',
-    'dj_rest_auth.registration',
-    'apps.Account',
-    'apps.Privacy',
-    'apps.Relationships',
-    'apps.Chat',
+    "django.contrib.admin",
+    "django.contrib.auth",
+    "django.contrib.contenttypes",
+    "django.contrib.sessions",
+    "django.contrib.messages",
+    "django.contrib.staticfiles",
+    "django.contrib.sites",
+    "corsheaders",
+    "rest_framework",
+    "rest_framework.authtoken",
+    "allauth",
+    "allauth.account",
+    "allauth.socialaccount",
+    "dj_rest_auth",
+    "dj_rest_auth.registration",
+    "apps.Account",
+    "apps.Privacy",
+    "apps.Relationships",
+    "apps.Chat",
+    "cloudinary",
+    "cloudinary_storage",
 ]
 
 SITE_ID = 1
 
 MIDDLEWARE = [
-    'allauth.account.middleware.AccountMiddleware',
-    'django.middleware.security.SecurityMiddleware',
-    'corsheaders.middleware.CorsMiddleware',
-    'django.contrib.sessions.middleware.SessionMiddleware',
-    'django.middleware.common.CommonMiddleware',
-    'django.middleware.csrf.CsrfViewMiddleware',
-    'django.contrib.auth.middleware.AuthenticationMiddleware',
-    'django.contrib.messages.middleware.MessageMiddleware',
-    'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    "allauth.account.middleware.AccountMiddleware",
+    "django.middleware.security.SecurityMiddleware",
+    "corsheaders.middleware.CorsMiddleware",
+    "django.contrib.sessions.middleware.SessionMiddleware",
+    "django.middleware.locale.LocaleMiddleware",
+    "django.middleware.common.CommonMiddleware",
+    "django.middleware.csrf.CsrfViewMiddleware",
+    "django.contrib.auth.middleware.AuthenticationMiddleware",
+    "django.contrib.messages.middleware.MessageMiddleware",
+    "django.middleware.clickjacking.XFrameOptionsMiddleware",
 ]
 
-ROOT_URLCONF = 'mcda_api_project.urls'
+ROOT_URLCONF = "mcda_api_project.urls"
 
 TEMPLATES = [
     {
-        'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
-        'APP_DIRS': True,
-        'OPTIONS': {
-            'context_processors': [
-                'django.template.context_processors.request',
-                'django.contrib.auth.context_processors.auth',
-                'django.contrib.messages.context_processors.messages',
+        "BACKEND": "django.template.backends.django.DjangoTemplates",
+        "DIRS": [],
+        "APP_DIRS": True,
+        "OPTIONS": {
+            "context_processors": [
+                "django.template.context_processors.request",
+                "django.contrib.auth.context_processors.auth",
+                "django.contrib.messages.context_processors.messages",
             ],
         },
     },
 ]
 
-WSGI_APPLICATION = 'mcda_api_project.wsgi.application'
+WSGI_APPLICATION = "mcda_api_project.wsgi.application"
 ASGI_APPLICATION = "mcda_api_project.asgi.application"
 
 CHANNEL_LAYERS = {
@@ -117,21 +125,21 @@ CHANNEL_LAYERS = {
 # https://docs.djangoproject.com/en/5.2/ref/settings/#databases
 
 DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.mysql',
-        'NAME': os.getenv('DB_NAME'),  # Set to your database name
-        'USER': os.getenv('DB_USER'),  # Set to your database user
+    "default": {
+        "ENGINE": "django.db.backends.mysql",
+        "NAME": os.getenv("DB_NAME"),  # Set to your database name
+        "USER": os.getenv("DB_USER"),  # Set to your database user
         # Set to your database password
-        'PASSWORD': os.getenv('DB_USER_PASSWORD'),
+        "PASSWORD": os.getenv("DB_USER_PASSWORD"),
         # Set to the MySQL server's host, e.g., 'localhost'
-        'HOST': os.getenv('DB_HOST'),
+        "HOST": os.getenv("DB_HOST"),
         # Set to the MySQL server's port, if different from the default (3306)
-        'PORT': os.getenv('DB_PORT'),
+        "PORT": os.getenv("DB_PORT"),
     }
 }
 
 # Test database configuration - uses SQLite for faster tests
-if 'test' in sys.argv or 'pytest' in sys.modules:
+if "test" in sys.argv or "pytest" in sys.modules:
     # Use in-memory channel layer for tests to avoid event loop issues
     CHANNEL_LAYERS = {
         "default": {
@@ -142,61 +150,63 @@ if 'test' in sys.argv or 'pytest' in sys.modules:
 # Password validation
 # https://docs.djangoproject.com/en/5.2/ref/settings/#auth-password-validators
 
-AUTH_USER_MODEL = 'Account.Users'
+AUTH_USER_MODEL = "Account.Users"
 
 AUTH_PASSWORD_VALIDATORS = [
     {
-        'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator',
+        "NAME": "django.contrib.auth.password_validation.UserAttributeSimilarityValidator",
     },
     {
-        'NAME': 'django.contrib.auth.password_validation.MinimumLengthValidator',
+        "NAME": "django.contrib.auth.password_validation.MinimumLengthValidator",
     },
     {
-        'NAME': 'django.contrib.auth.password_validation.CommonPasswordValidator',
+        "NAME": "django.contrib.auth.password_validation.CommonPasswordValidator",
     },
     {
-        'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator',
+        "NAME": "django.contrib.auth.password_validation.NumericPasswordValidator",
     },
 ]
 
 REST_FRAMEWORK = {
-    'DEFAULT_PERMISSION_CLASSES': ('rest_framework.permissions.IsAuthenticated',),
-    'DEFAULT_AUTHENTICATION_CLASSES': (
-        'rest_framework_simplejwt.authentication.JWTAuthentication',
+    "DEFAULT_PERMISSION_CLASSES": ("rest_framework.permissions.IsAuthenticated",),
+    "DEFAULT_AUTHENTICATION_CLASSES": (
+        "rest_framework_simplejwt.authentication.JWTAuthentication",
     ),
-    'EXCEPTION_HANDLER': 'services.exceptions.custom_exception.custom_exception_handler',
+    "EXCEPTION_HANDLER": "services.exceptions.custom_exception.custom_exception_handler",
 }
 
 AUTHENTICATION_BACKENDS = [
-    'django.contrib.auth.backends.ModelBackend',
-    'allauth.account.auth_backends.AuthenticationBackend',
+    "django.contrib.auth.backends.ModelBackend",
+    "allauth.account.auth_backends.AuthenticationBackend",
 ]
 
 # Internationalization
 # https://docs.djangoproject.com/en/5.2/topics/i18n/
+LANGUAGE_CODE = "pt-br"
 
-LANGUAGE_CODE = 'en-us'
+# 2. Ajusta o fuso horário (opcional, mas recomendado)
+TIME_ZONE = "America/Sao_Paulo"
 
-TIME_ZONE = 'UTC'
-
+# 3. Garante que o sistema de tradução esteja ativo
 USE_I18N = True
 
-USE_TZ = True
+# 4. Garante que o formato de datas/números siga o local (opcional)
+USE_L10N = True
 
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/5.2/howto/static-files/
 
-STATIC_URL = 'static/'
+STATIC_URL = "static/"
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field
 
-DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
 SIMPLE_JWT = {
-    'REFRESH_TOKEN_LIFETIME': timedelta(days=15),
-    'ROTATE_REFRESH_TOKENS': True,
+    "REFRESH_TOKEN_LIFETIME": timedelta(days=15),
+    "ROTATE_REFRESH_TOKENS": True,
 }
 
 # djangorestframework-simplejwt
@@ -208,17 +218,25 @@ SIMPLE_JWT = {
 REST_AUTH = {
     "USE_JWT": True,
     "JWT_AUTH_HTTPONLY": False,  # Makes sure refresh token is sent
-    'REGISTER_SERIALIZER': 'apps.Account.serializer.CustomRegisterSerializer',
-    'USER_DETAILS_SERIALIZER': 'apps.Account.serializer.CustomUserDetailsSerializer',
+    "REGISTER_SERIALIZER": "apps.Account.serializer.CustomRegisterSerializer",
+    "USER_DETAILS_SERIALIZER": "apps.Account.serializer.CustomUserDetailsSerializer",
 }
 
-REST_AUTH_REGISTER_SERIALIZERS = {
-}
+REST_AUTH_REGISTER_SERIALIZERS = {}
 
 ACCOUNT_EMAIL_VERIFICATION = None
-ACCOUNT_AUTHENTICATION_METHOD = 'email'
+ACCOUNT_AUTHENTICATION_METHOD = "email"
 ACCOUNT_EMAIL_REQUIRED = True
 
 # CORS settings
 CORS_ALLOW_ALL_ORIGINS = True  # Only for development!
 CORS_ALLOW_CREDENTIALS = True
+
+# CLOUDINARY SETTINGS
+cloudinary.config(
+    cloud_name=CLOUDINARY_CLOUD_NAME,
+    api_key=CLOUDINARY_API_KEY,
+    api_secret=CLOUDINARY_API_SECRET,
+)
+MEDIA_URL = "/mcdamedia/"
+DEFAULT_FILE_STORAGE = "cloudinary_storage.storage.MediaCloudinaryStorage"

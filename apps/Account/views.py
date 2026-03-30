@@ -15,7 +15,7 @@ class ManageUserView(APIView):
         user = request.user
         try:
             Users.objects.get(id=user.id).delete()
-            return Response({"message": f"@{user.username}'s account was successfully deleted"}, status=status.HTTP_200_OK)
+            return Response({"message": f"A conta @{user.username} foi excluída com sucesso"}, status=status.HTTP_200_OK)
         except Exception as e:
             return Response({"message": "Error in deleting user", "full_error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
@@ -27,7 +27,7 @@ class GetUserByFilterView(APIView):
             email = request.query_params.get('email')
             all_users = []
             if not username and not email:
-                return Response({"message": "Please provide an username or email"}, status=status.HTTP_400_BAD_REQUEST)
+                return Response({"message": "Por favor insira um username ou e-mail"}, status=status.HTTP_400_BAD_REQUEST)
             else:
                 if username and email:
                     all_users = Users.objects.filter(
@@ -39,4 +39,4 @@ class GetUserByFilterView(APIView):
 
             return Response({"user_count": len(all_users)}, status=status.HTTP_200_OK)
         except Exception as e:
-            return Response({"message": "Error in getting user by filter", "full_error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
+            return Response({"message": "Erro ao filtrar usuário", "full_error": str(e)}, status=status.HTTP_400_BAD_REQUEST)

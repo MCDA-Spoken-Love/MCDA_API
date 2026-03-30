@@ -7,15 +7,13 @@ from django_mysql.models import EnumField
 
 
 class Gender(Enum):
-    CISMALE = 'CISMALE'
-    CISFEMALE = 'CISFEMALE'
-    TRANSMALE = 'TRANSMALE'
-    TRANSFEMALE = 'TRANSFEMALE'
-    NONBINARY = 'NONBINARY'
-    INTERSEX = 'INTERSEX'
-    AGENDER = 'AGENDER'
-    OTHER = 'OTHER'
-    PREFERNOTTOSAY = 'PREFERNOTTOSAY'
+    CISMALE = "CISMALE"
+    CISFEMALE = "CISFEMALE"
+    TRANSMALE = "TRANSMALE"
+    TRANSFEMALE = "TRANSFEMALE"
+    NONBINARY = "NONBINARY"
+    OTHER = "OTHER"
+    PREFERNOTTOSAY = "PREFERNOTTOSAY"
 
     @classmethod
     def choices(cls):
@@ -23,15 +21,13 @@ class Gender(Enum):
 
 
 class Sexuality(Enum):
-    HETEROSEXUAL = 'HETEROSEXUAL'
-    HOMOSEXUAL = 'HOMOSEXUAL'
-    BISEXUAL = 'BISEXUAL'
-    ASEXUAL = 'ASEXUAL'
-    PANSEXUAL = 'PANSEXUAL'
-    DEMISEXUAL = 'DEMISEXUAL'
-    POLYSEXUAL = 'POLYSEXUAL'
-    OTHER = 'OTHER'
-    PREFERNOTTOSAY = 'PREFERNOTTOSAY'
+    HETEROSEXUAL = "HETEROSEXUAL"
+    HOMOSEXUAL = "HOMOSEXUAL"
+    BISEXUAL = "BISEXUAL"
+    ASEXUAL = "ASEXUAL"
+    PANSEXUAL = "PANSEXUAL"
+    OTHER = "OTHER"
+    PREFERNOTTOSAY = "PREFERNOTTOSAY"
 
     @classmethod
     def choices(cls):
@@ -46,10 +42,10 @@ class Users(AbstractUser):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     password = models.CharField(max_length=255)
     email = models.EmailField(max_length=255, unique=True)
-    gender = EnumField(
-        choices=GENDER_CHOICES, null=True)
-    sexuality = EnumField(
-        choices=SEXUALITY_CHOICES, null=True)
+    gender = EnumField(choices=GENDER_CHOICES, null=True)
+    sexuality = EnumField(choices=SEXUALITY_CHOICES, null=True)
+    profile_picture = models.URLField(null=True, blank=True)
+
     connection_code = models.CharField(max_length=255, unique=True)
     has_accepted_terms_and_conditions = models.BooleanField(default=False)
     has_accepted_privacy_policy = models.BooleanField(default=False)
@@ -57,6 +53,7 @@ class Users(AbstractUser):
     def save(self, *args, **kwargs):
         super().save(*args, **kwargs)
         from apps.Privacy.models import UserPrivacy
+
         UserPrivacy.objects.get_or_create(user=self)
 
     def __str__(self):

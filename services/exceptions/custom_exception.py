@@ -10,7 +10,7 @@ def custom_exception_handler(exc, context):
         # You can customize the response data here
         response.data['status_code'] = response.status_code
         response.data['message'] = response.data.get(
-            'detail', 'An error occurred.')
+            'detail', 'Um erro ocorreu.')
     else:
         # Handle non-DRF exceptions
         return Response({

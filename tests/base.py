@@ -1,6 +1,7 @@
 """
 Base test classes and utilities for the MCDA API project.
 """
+
 from django.contrib.auth import get_user_model
 from django.test import TestCase
 from rest_framework import status
@@ -18,18 +19,24 @@ class BaseTestCase(TestCase):
         super().setUpClass()
         cls.User = get_user_model()
 
-    def create_user(self, username="testuser", email="test@example.com",
-                    password="testpassword123", connection_code=None, **kwargs):
+    def create_user(
+        self,
+        username="testuser",
+        email="test@example.com",
+        password="testpassword123",
+        connection_code=None,
+        **kwargs,
+    ):
         """Helper method to create a user with sensible defaults"""
         if connection_code is None:
             connection_code = f"TEST{username[-2:].upper()}"
 
         user_data = {
-            'username': username,
-            'email': email,
-            'password': password,
-            'connection_code': connection_code,
-            **kwargs
+            "username": username,
+            "email": email,
+            "password": password,
+            "connection_code": connection_code,
+            **kwargs,
         }
 
         return Users.objects.create_user(**user_data)
@@ -41,15 +48,17 @@ class BaseTestCase(TestCase):
             user = self.create_user(
                 username=f"user{i+1}",
                 email=f"user{i+1}@example.com",
-                connection_code=f"USR{i+1:02d}"
+                connection_code=f"USR{i+1:02d}",
             )
             users.append(user)
         return users
 
-    def assertResponseError(self, response, expected_status=status.HTTP_400_BAD_REQUEST):
+    def assertResponseError(
+        self, response, expected_status=status.HTTP_400_BAD_REQUEST
+    ):
         """Assert that response contains an error with expected status"""
         self.assertEqual(response.status_code, expected_status)
-        self.assertIn('message', response.data)
+        self.assertIn("message", response.data)
 
     def assertResponseSuccess(self, response, expected_status=status.HTTP_200_OK):
         """Assert that response is successful with expected status"""
@@ -63,18 +72,24 @@ class BaseAPITestCase(APITestCase):
         super().setUp()
         self.client = APIClient()
 
-    def create_user(self, username="testuser", email="test@example.com",
-                    password="testpassword123", connection_code=None, **kwargs):
+    def create_user(
+        self,
+        username="testuser",
+        email="test@example.com",
+        password="testpassword123",
+        connection_code=None,
+        **kwargs,
+    ):
         """Helper method to create a user with sensible defaults"""
         if connection_code is None:
             connection_code = f"TEST{username[-2:].upper()}"
 
         user_data = {
-            'username': username,
-            'email': email,
-            'password': password,
-            'connection_code': connection_code,
-            **kwargs
+            "username": username,
+            "email": email,
+            "password": password,
+            "connection_code": connection_code,
+            **kwargs,
         }
 
         return Users.objects.create_user(**user_data)
@@ -84,25 +99,34 @@ class BaseAPITestCase(APITestCase):
         self.client.force_authenticate(user=user)
         return user
 
-    def create_and_authenticate_user(self, username="testuser", email="test@example.com",
-                                     password="testpassword123", **kwargs):
+    def create_and_authenticate_user(
+        self,
+        username="testuser",
+        email="test@example.com",
+        password="testpassword123",
+        **kwargs,
+    ):
         """Create a user and authenticate them in one step"""
         user = self.create_user(username, email, password, **kwargs)
         self.authenticate_user(user)
         return user
 
-    def create_privacy_settings(self, user, allow_status_visibility=True, allow_last_seen=True):
+    def create_privacy_settings(
+        self, user, allow_status_visibility=True, allow_last_seen=True
+    ):
         """Helper method to create privacy settings for a user"""
         return UserPrivacy.objects.create(
             user=user,
             allow_status_visibility=allow_status_visibility,
-            allow_last_seen=allow_last_seen
+            allow_last_seen=allow_last_seen,
         )
 
-    def assertResponseError(self, response, expected_status=status.HTTP_400_BAD_REQUEST):
+    def assertResponseError(
+        self, response, expected_status=status.HTTP_400_BAD_REQUEST
+    ):
         """Assert that response contains an error with expected status"""
         self.assertEqual(response.status_code, expected_status)
-        self.assertIn('message', response.data)
+        self.assertIn("message", response.data)
 
     def assertResponseSuccess(self, response, expected_status=status.HTTP_200_OK):
         """Assert that response is successful with expected status"""
@@ -128,8 +152,7 @@ class ModelTestMixin:
     def assertModelFieldChoices(self, model, field_name, expected_choices):
         """Assert that a model field has specific choices"""
         field = model._meta.get_field(field_name)
-        field_choices = [choice[0]
-                         for choice in field.choices] if field.choices else []
+        field_choices = [choice[0] for choice in field.choices] if field.choices else []
         for choice in expected_choices:
             self.assertIn(choice, field_choices)
 
@@ -184,14 +207,17 @@ class DatabaseTestMixin:
 # Combined base classes for different types of tests
 class BaseModelTest(BaseTestCase, ModelTestMixin, DatabaseTestMixin):
     """Base class for model tests"""
+
     pass
 
 
 class BaseSerializerTest(BaseTestCase, SerializerTestMixin, ModelTestMixin):
     """Base class for serializer tests"""
+
     pass
 
 
 class BaseViewTest(BaseAPITestCase, DatabaseTestMixin):
     """Base class for view tests"""
+
     pass

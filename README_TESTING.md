@@ -2,14 +2,15 @@
 
 ## Overview
 
-This document describes the comprehensive test suite created for the MCDA API project using Django's native testing framework.
+This document describes the comprehensive test suite created for the MCDA API project using Django's native testing
+framework.
 
 ## Test Coverage
 
 ### Account App Tests (22 tests)
 
 - ✅ **GenderEnumTest**: Tests for Gender enum choices and functionality
-- ✅ **SexualityEnumTest**: Tests for Sexuality enum choices and functionality  
+- ✅ **SexualityEnumTest**: Tests for Sexuality enum choices and functionality
 - ✅ **UsersModelTest**: Tests for Users model creation, validation, and constraints
 - ✅ **EmailToCodeUtilTest**: Tests for the email_to_code utility function
 - ✅ **CustomRegisterSerializerTest**: Tests for user registration serializer validation
@@ -22,7 +23,7 @@ This document describes the comprehensive test suite created for the MCDA API pr
 - ✅ **UserPrivacySerializerTest**: Tests for privacy settings serialization
 - ✅ **PrivacyViewsTest**: Tests for privacy API endpoints (get, toggle status/last_seen)
 
-### Relationships App Tests (15 tests)  
+### Relationships App Tests (15 tests)
 
 - ✅ **StatusEnumTest**: Tests for relationship status enum choices
 - ✅ **RelationshipModelTest**: Tests for Relationship model and constraints
@@ -58,23 +59,19 @@ Located in `tests/test_fixtures.py`:
 
 ## Running Tests
 
-### Using the Custom Test Runner
+### Using Pytest (Recommended)
 
 ```bash
+# Activate virtual environment first
+source venv/bin/activate
 # Run all tests
-python test_runner.py all
-
-# Run tests for specific app
-python test_runner.py Account
-python test_runner.py Privacy  
-python test_runner.py Relationships
-
-# Run tests with coverage report
-python test_runner.py coverage
-
-# Run specific test class or method
-python test_runner.py specific Account.tests.UsersModelTest
-python test_runner.py specific Account.tests.UsersModelTest.test_create_user
+pytest
+# Run specific app tests
+pytest Account/tests
+pytest Privacy/tests
+pytest Relationships/tests
+# Run with verbosity
+pytest -v
 ```
 
 ### Using Django's Test Command
