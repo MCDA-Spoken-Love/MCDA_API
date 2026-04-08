@@ -1,5 +1,4 @@
 from io import BytesIO
-from unittest.mock import patch
 
 from PIL import Image
 from django.core.files.uploadedfile import SimpleUploadedFile
@@ -21,7 +20,7 @@ class GenderEnumTest(TestCase):
 
     def test_gender_choices(self):
         """Test that Gender enum returns proper choices"""
-        choices = Gender.choices()
+        choices = Gender.choices
         self.assertIsInstance(choices, list)
         self.assertEqual(len(choices), 7)
 
@@ -37,7 +36,7 @@ class SexualityEnumTest(TestCase):
 
     def test_sexuality_choices(self):
         """Test that Sexuality enum returns proper choices"""
-        choices = Sexuality.choices()
+        choices = Sexuality.choices
         self.assertIsInstance(choices, list)
         self.assertEqual(len(choices), 7)
 
@@ -151,6 +150,17 @@ class CustomRegisterSerializerTest(TestCase):
             "profile_picture": uploaded,
         }
 
+        self.empty_optional_data = {
+            "first_name": "John",
+            "last_name": "Doe",
+            "email": "john@example.com",
+            "username": "john_doe",
+            "password1": "strongpassword123",
+            "password2": "strongpassword123",
+            "has_accepted_terms_and_conditions": True,
+            "has_accepted_privacy_policy": True,
+        }
+
     def test_valid_serializer(self):
         """Test serializer with valid data"""
         serializer = CustomRegisterSerializer(data=self.valid_data)
@@ -164,6 +174,11 @@ class CustomRegisterSerializerTest(TestCase):
         serializer = CustomRegisterSerializer(data=invalid_data)
         self.assertFalse(serializer.is_valid())
         self.assertIn("non_field_errors", serializer.errors)
+
+    def test_empty_optional_fields(self):
+        """Test empty optional fields"""
+        serializer = CustomRegisterSerializer(data=self.empty_optional_data)
+        self.assertTrue(serializer.is_valid())
 
     def test_duplicate_email_validation(self):
         """Test validation fails for duplicate email"""
@@ -186,17 +201,6 @@ class CustomRegisterSerializerTest(TestCase):
         serializer = CustomRegisterSerializer(data=self.valid_data)
         self.assertFalse(serializer.is_valid())
         self.assertIn("username", serializer.errors)
-
-    @patch("services.cloudinary_service.upload_image")
-    def test_profile_picture_upload(self, mock_upload_image):
-        # Arrange: Mock Cloudinary upload to return a fake URL
-        mock_upload_image.return_value = "https://cloudinary.com/fake.jpg"
-        serializer = CustomRegisterSerializer(data=self.valid_data)
-        self.assertTrue(serializer.is_valid(), serializer.errors)
-        user = serializer.save(request=None)
-
-        self.assertEqual(user.profile_picture, "https://cloudinary.com/fake.jpg")
-        self.assertTrue(Users.objects.filter(email=user.email).exists())
 
 
 class AccountViewsTest(APITestCase):

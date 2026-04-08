@@ -1,50 +1,48 @@
 import uuid
-from enum import Enum
 
 from django.contrib.auth.models import AbstractUser
 from django.db import models
-from django_mysql.models import EnumField
 
 
-class Gender(Enum):
-    CISMALE = "CISMALE"
-    CISFEMALE = "CISFEMALE"
-    TRANSMALE = "TRANSMALE"
-    TRANSFEMALE = "TRANSFEMALE"
-    NONBINARY = "NONBINARY"
-    OTHER = "OTHER"
-    PREFERNOTTOSAY = "PREFERNOTTOSAY"
-
-    @classmethod
-    def choices(cls):
-        return [(key.value, key.name) for key in cls]
-
-
-class Sexuality(Enum):
-    HETEROSEXUAL = "HETEROSEXUAL"
-    HOMOSEXUAL = "HOMOSEXUAL"
-    BISEXUAL = "BISEXUAL"
-    ASEXUAL = "ASEXUAL"
-    PANSEXUAL = "PANSEXUAL"
-    OTHER = "OTHER"
-    PREFERNOTTOSAY = "PREFERNOTTOSAY"
+class Gender(models.TextChoices):
+    CISMALE = "CISMALE", "Homem Cis"
+    CISFEMALE = "CISFEMALE", "Mulher Cis"
+    TRANSMALE = "TRANSMALE", "Homem Trans"
+    TRANSFEMALE = "TRANSFEMALE", "Mulher Trans"
+    NONBINARY = "NONBINARY", "Não binaria"
+    OTHER = "OTHER", "Outro"
+    PREFERNOTTOSAY = "PREFERNOTTOSAY", "Prefiro não dizer"
 
     @classmethod
     def choices(cls):
         return [(key.value, key.name) for key in cls]
 
 
-GENDER_CHOICES = [e.value for e in Gender]
-SEXUALITY_CHOICES = [e.value for e in Sexuality]
+class Sexuality(models.TextChoices):
+    HETEROSEXUAL = "HETEROSEXUAL", "Heterossexual"
+    HOMOSEXUAL = "HOMOSEXUAL", "Homossexual"
+    BISEXUAL = "BISEXUAL", "Bissexual"
+    ASEXUAL = "ASEXUAL", "Assexual"
+    PANSEXUAL = "PANSEXUAL", "Pansexual"
+    OTHER = "OTHER", "Outro"
+    PREFERNOTTOSAY = "PREFERNOTTOSAY", "Prefiro não dizer"
+
+    @classmethod
+    def choices(cls):
+        return [(key.value, key.name) for key in cls]
 
 
 class Users(AbstractUser):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     password = models.CharField(max_length=255)
     email = models.EmailField(max_length=255, unique=True)
-    gender = EnumField(choices=GENDER_CHOICES, null=True)
-    sexuality = EnumField(choices=SEXUALITY_CHOICES, null=True)
-    profile_picture = models.URLField(null=True, blank=True)
+    gender = models.CharField(
+        max_length=255, choices=Gender.choices, blank=True, default=""
+    )
+    sexuality = models.CharField(
+        max_length=255, choices=Sexuality.choices, blank=True, default=""
+    )
+    profile_picture = models.URLField(max_length=255, blank=True, default="")
 
     connection_code = models.CharField(max_length=255, unique=True)
     has_accepted_terms_and_conditions = models.BooleanField(default=False)

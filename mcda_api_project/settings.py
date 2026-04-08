@@ -39,6 +39,7 @@ DEBUG = True
 
 ALLOWED_HOSTS = [
     "localhost",
+    "192.168.15.9",
     "127.0.0.1",
     "177.18.229.106:0",
     "10.0.2.2",  # Android emulator

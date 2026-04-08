@@ -6,15 +6,14 @@ from rest_framework import serializers
 
 from apps.Account.models import Gender, Sexuality, Users
 from apps.Account.utils import email_to_code
-from services import cloudinary_service
 
 
 class CustomRegisterSerializer(serializers.Serializer):
     first_name = serializers.CharField(max_length=30)
     last_name = serializers.CharField(max_length=30)
     email = serializers.EmailField(max_length=255, required=True)
-    gender = serializers.ChoiceField(choices=Gender.choices(), required=False)
-    sexuality = serializers.ChoiceField(choices=Sexuality.choices(), required=False)
+    gender = serializers.ChoiceField(choices=Gender.choices, required=False)
+    sexuality = serializers.ChoiceField(choices=Sexuality.choices, required=False)
     has_accepted_terms_and_conditions = serializers.BooleanField(default=False)
     has_accepted_privacy_policy = serializers.BooleanField(default=False)
     username = serializers.CharField(
@@ -56,8 +55,7 @@ class CustomRegisterSerializer(serializers.Serializer):
         user.username = self.validated_data["username"]
         user.password1 = self.validated_data["password1"]
         user.password2 = self.validated_data["password2"]
-        user.gender = self.validated_data["gender"]
-        user.sexuality = self.validated_data["sexuality"]
+
         user.connection_code = email_to_code(self.validated_data["email"])
         user.has_accepted_terms_and_conditions = self.validated_data[
             "has_accepted_terms_and_conditions"
@@ -66,10 +64,15 @@ class CustomRegisterSerializer(serializers.Serializer):
             "has_accepted_privacy_policy"
         ]
         user.username = self.validated_data["username"]
-        profile_picture_file = self.validated_data.get("profile_picture")
-        if profile_picture_file:
-            uploaded_file = cloudinary_service.upload_image(profile_picture_file)
-            user.profile_picture = uploaded_file
+
+        if self.validated_data.get("sexuality"):
+            user.sexuality = self.validated_data["sexuality"]
+
+        if self.validated_data.get("gender"):
+            user.gender = self.validated_data["gender"]
+
+        if self.validated_data.get("profile_picture"):
+            user.profile_picture = self.validated_data["profile_picture"]
 
         user.save()
         return user
@@ -81,8 +84,9 @@ class CustomRegisterSerializer(serializers.Serializer):
             "password2": self.validated_data["password2"],
             "first_name": self.validated_data["first_name"],
             "last_name": self.validated_data["last_name"],
-            "gender": self.validated_data["gender"],
-            "sexuality": self.validated_data["sexuality"],
+            "gender": self.validated_data.get("gender", ""),
+            "sexuality": self.validated_data.get("sexuality", ""),
+            "profile_picture": self.validated_data.get("profile_picture", ""),
             "has_accepted_terms_and_conditions": self.validated_data[
                 "has_accepted_terms_and_conditions"
             ],
