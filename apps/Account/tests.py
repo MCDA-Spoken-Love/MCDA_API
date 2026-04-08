@@ -288,6 +288,95 @@ class AccountViewsTest(APITestCase):
 
         self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
 
+    def test_manage_user_patch_authenticated(self):
+        """Test manage_user PATCH endpoint when authenticated"""
+        url = reverse("manage_user")
+        self.client.force_authenticate(user=self.user)
+        response = self.client.patch(
+            url,
+            {
+                "gender": "OTHER",
+                "sexuality": "OTHER",
+                "profile_picture": "https://teste.jpg",
+            },
+        )
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data["message"], "Usuário atualizado com sucesso")
+
+    def test_manage_user_patch_authenticated_fail_gender(self):
+        """Test manage_user failed PATCH endpoint when authenticated"""
+        url = reverse("manage_user")
+        self.client.force_authenticate(user=self.user)
+        response = self.client.patch(
+            url,
+            {
+                "gender": " ",
+                "sexuality": "OTHER",
+                "profile_picture": "https://teste.jpg",
+            },
+        )
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertEqual(response.data["message"], "Dados de atualização invalidos")
+
+    def test_manage_user_patch_authenticated_fail_sexuality(self):
+        """Test manage_user failed PATCH endpoint when authenticated"""
+        url = reverse("manage_user")
+        self.client.force_authenticate(user=self.user)
+        response = self.client.patch(
+            url,
+            {
+                "gender": "OTHER",
+                "sexuality": "   ",
+                "profile_picture": "https://teste.jpg",
+            },
+        )
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertEqual(response.data["message"], "Dados de atualização invalidos")
+
+    def test_manage_user_patch_authenticated_fail_profile_pic(self):
+        """Test manage_user failed PATCH endpoint when authenticated"""
+        url = reverse("manage_user")
+        self.client.force_authenticate(user=self.user)
+        response = self.client.patch(
+            url,
+            {
+                "gender": "OTHER",
+                "sexuality": "OTHER",
+                "profile_picture": "/teste.jpg",
+            },
+        )
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertEqual(response.data["message"], "Dados de atualização invalidos")
+
+    def test_manage_user_patch_authenticated_fail_unchangeable_params(self):
+        """Test manage_user failed PATCH endpoint when authenticated and unchangeable params are provided"""
+        url = reverse("manage_user")
+        self.client.force_authenticate(user=self.user)
+        response = self.client.patch(
+            url,
+            {
+                "username": "OTHER",
+                "email": "OTHER@gmail.com",
+                "password1": "/teste.jpg",
+                "password2": "/teste.jpg",
+            },
+        )
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertEqual(response.data["message"], "Dados de atualização invalidos")
+
+    def test_manage_user_patch_unauthenticated(self):
+        """Test manage_user PATCH endpoint when not authenticated"""
+        url = reverse("manage_user")
+        response = self.client.patch(
+            url,
+            {
+                "gender": "OTHER",
+                "sexuality": "OTHER",
+                "profile_picture": "/teste.jpg",
+            },
+        )
+        self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
+
 
 class CustomUserDetailsSerializerTest(TestCase):
     """Test CustomUserDetailsSerializer functionality"""

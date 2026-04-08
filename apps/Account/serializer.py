@@ -108,6 +108,22 @@ class CustomRegisterSerializer(serializers.Serializer):
         return user
 
 
+class UserAccountSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Users
+        fields = ["gender", "sexuality", "profile_picture"]
+
+    def validate(self, attrs):
+        allowed_fields = set(self.fields.keys())
+        incoming_fields = set(self.initial_data.keys())
+        extra_fields = incoming_fields - allowed_fields
+        if extra_fields:
+            raise serializers.ValidationError(
+                f"Os seguintes campos não são permitidos: {', '.join(extra_fields)}"
+            )
+        return super().validate(attrs)
+
+
 class CustomUserDetailsSerializer(serializers.ModelSerializer):
     relationship = serializers.SerializerMethodField()
 

@@ -4,6 +4,7 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from apps.Account.models import Users
+from apps.Account.serializer import UserAccountSerializer
 
 
 class ManageUserView(APIView):
@@ -13,6 +14,33 @@ class ManageUserView(APIView):
         return Response(
             {"username": user.username, "email": user.email}, status=status.HTTP_200_OK
         )
+
+    @staticmethod
+    def patch(request) -> Response:
+        user = request.user
+        try:
+            serializer = UserAccountSerializer(user, data=request.data, partial=True)
+            print(serializer)
+            if serializer.is_valid():
+                serializer.save()
+                return Response(
+                    {"message": "Usuário atualizado com sucesso"},
+                    status=status.HTTP_200_OK,
+                )
+            else:
+                return Response(
+                    {
+                        "message": "Dados de atualização invalidos",
+                        "errors": serializer.errors,
+                    },
+                    status=status.HTTP_400_BAD_REQUEST,
+                )
+
+        except Exception as e:
+            return Response(
+                {"message": "Error ao tentar atualizar usuário", "full_error": str(e)},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
 
     @staticmethod
     def delete(request) -> Response:
