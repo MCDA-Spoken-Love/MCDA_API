@@ -19,17 +19,16 @@ class CloudinaryService:
         timestamp = int(time.time())
         signature = cloudinary.utils.api_sign_request(
             {
-                "timestamp": timestamp,
-                "public_id": public_id,
                 "folder": folder_name,
-                "source": "uw",
+                "public_id": public_id,
+                "timestamp": timestamp,
             },
             self.api_secret,
         )
 
         return {
+            "folder": folder_name,
+            "public_id": public_id,
             "signature": signature,
             "timestamp": timestamp,
-            "public_id": public_id,
-            "folder": folder_name,
         }
